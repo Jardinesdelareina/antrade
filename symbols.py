@@ -1,7 +1,0 @@
-symbols = [
-    'BTCUSDT', 'ETHUSDT', 'BNBUSDT',
-    'XRPUSDT', 'DOTUSDT', 'LINKUSDT',
-    'ADAUSDT', 'MATICUSDT', 'AVAXUSDT', 
-    'UNIUSDT', 'TRXUSDT', 'DOGEUSDT', 
-    'LTCUSDT', 'SOLUSDT',
-]

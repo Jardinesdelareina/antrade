@@ -2,7 +2,6 @@ from config import CLIENT, CHAT_ID, TELETOKEN
 import pandas as pd
 import requests, time
 from binance.exceptions import BinanceAPIException as bae
-from symbols import symbols
 
 
 class Antrade:
@@ -14,14 +13,19 @@ class Antrade:
 
     def get_data(self):
         # Получение данных
-        df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, self.interval, '1000m UTC'))
+        try:
+            df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, self.interval, '1000m UTC'))
+        except bae:
+            print(bae)
+            time.sleep(30)
+            df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, self.interval, '1000m UTC'))
         df = df.iloc[:,:6]
         df.columns = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
         df = df.set_index('Time')
         df.index = pd.to_datetime(df.index, unit='ms')
         df = df.astype(float)
         df['FastSMA'] = df.Close.rolling(window=3).mean()
-        df['SlowSMA'] = df.Close.rolling(window=200).mean()
+        df['SlowSMA'] = df.Close.rolling(window=100).mean()
         return df
 
     def send_message(self, message):
@@ -32,42 +36,45 @@ class Antrade:
         )
 
     def main(self, open_position=False):
-        # Описание алгоритма
+        # Логика
+
         while True:
             data = self.get_data()
+            order_volume = round(self.qnty/data.Close.iloc[-1], 3)
+
             if not open_position:
                 if data.SlowSMA.iloc[-1] < data.FastSMA.iloc[-1] \
-                    and data.SlowSMA.iloc[-1] > data.FastSMA.iloc[-2]:
-                    order = CLIENT.create_order(symbol=self.symbol, side='BUY', type='MARKET', quantity=self.qnty)
+                and data.SlowSMA.iloc[-1] >= data.FastSMA.iloc[-2]:
+                    order = CLIENT.create_order(symbol=self.symbol, side='BUY', type='MARKET', quantity=order_volume)
                     buyprice = float(order['fills'][0]['price'])
-                    message = self.symbol + ' Buy ' + buyprice
+                    message = self.symbol + ' Buy ' + str(buyprice)
                     self.send_message(message)
                     print(message)
                     open_position = True
-                    break
                 else:
-                    print('Ожидание')
-                    time.sleep(60)
+                    print(
+                        'Ожидание', 
+                        self.symbol, 
+                        round(data.SlowSMA.iloc[-1], 5), 
+                        round(data.FastSMA.iloc[-1], 5),
+                    )
 
-        if open_position:
-            while True:
-                data = self.get_data()
+            if open_position:
                 if data.SlowSMA.iloc[-1] > data.FastSMA.iloc[-1] \
-                    and data.SlowSMA.iloc[-1] < data.FastSMA.iloc[-2]:
-                    order = CLIENT.create_order(symbol=self.symbol, side='SELL', type='MARKET', quantity=self.qnty)
+                and data.SlowSMA.iloc[-1] <= data.FastSMA.iloc[-2]:
+                    order = CLIENT.create_order(symbol=self.symbol, side='SELL', type='MARKET', quantity=order_volume)
                     sellprice = float(order['fills'][0]['price'])
-                    result = f'Результат = {round((sellprice - buyprice) * self.qnty), 3}'
-                    print(result)
-                    message = self.symbol + ' Sell ' + result
+                    profit = round((sellprice - buyprice) * order_volume)
+                    result = f'Результат = {profit}'      
+                    message = self.symbol + ' Sell ' + str(result)
                     self.send_message(message)
                     print(message)
                     open_position = False
-                    break
                 else:
-                    print('Открыта позиция')
-                    time.sleep(60)
+                    print(f'Открыта позиция {self.symbol}')
+
+            time.sleep(60)
 
 
-bot = Antrade('LTCUSDT', '1m', 20)
-
+bot= Antrade('XRPUSDT', '1m', 50)
 bot.main()
