@@ -16,7 +16,7 @@ df = df.astype(float)
 
 # Создание SMA и добавление ее значений в таблицу
 df['FastSMA'] = df.Close.rolling(window=3).mean()
-df['SlowSMA'] = df.Close.rolling(window=200).mean()
+df['SlowSMA'] = df.Close.rolling(window=100).mean()
 df['Buy'] = np.where(
     df.SlowSMA.iloc[-1] < df.FastSMA.iloc[-1] and df.SlowSMA.iloc[-1] >= df.FastSMA.iloc[-2], True, False
 )

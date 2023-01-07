@@ -1,6 +1,6 @@
 from config import CLIENT, CHAT_ID, TELETOKEN
 import pandas as pd
-import requests, time
+import requests, time, json
 from binance.exceptions import BinanceAPIException as bae
 
 def get_data(symbol):
@@ -17,7 +17,8 @@ def get_data(symbol):
     df.index = pd.to_datetime(df.index, unit='ms')
     df = df.astype(float)
     df['FastSMA'] = df.Close.rolling(window=3).mean()
-    df['SlowSMA'] = df.Close.rolling(window=50).mean()
+    df['SlowSMA'] = df.Close.rolling(window=100).mean()
+    df['CloseSMA'] = df.Close.rolling(window=50).mean()
     return df
 
 def send_message(message):
@@ -41,6 +42,7 @@ def main(symbol, qnty, open_position=False):
                 message = symbol + ' Buy ' + str(buyprice)
                 send_message(message)
                 print(message)
+                print(json.dumps(order, indent=4, sort_keys=True))
                 open_position = True
             else:
                 print(
@@ -60,6 +62,11 @@ def main(symbol, qnty, open_position=False):
                 send_message(message)
                 print(message)
                 open_position = False
+            elif data.FastSMA.iloc[-1] < data.CloweSMA.iloc[-1] \
+            and data.FastSMA.iloc[-1] > data.CloseSMA.iloc[-2]:
+                message = symbol + ' Закрыть '
+                send_message(message)
+                print(message)
             else:
                 print(f'Open position {symbol}')
 
