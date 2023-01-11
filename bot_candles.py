@@ -25,7 +25,7 @@ class BotCandles(Antrade):
                     self.place_order('SELL')
                     open_position = False
                 else:
-                    print(f'Open position {self.symbol} {str(self.quantity())}')
+                    print(f'Открыта позиция {self.symbol} {str(self.quantity())}')
 
             time.sleep(60)
 

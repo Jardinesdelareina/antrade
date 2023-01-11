@@ -1,4 +1,4 @@
-from .src.core import Antrade
+from src.core import Antrade
 import time
 
 
@@ -14,6 +14,10 @@ class BotSMA(Antrade):
                 if data.FastSMA.iloc[-1] > data.SlowSMA.iloc[-1] \
                 and data.FastSMA.iloc[-1] <= data.SlowSMA.iloc[-2]:
                     self.place_order('BUY')
+                    buy_price = float(self.order.get('fills')[0]['price'])
+                    message = f'{self.symbol} Buy {self.strategy} {str(buy_price)}'
+                    self.send_message(message)
+                    print(message)
                     open_position = True
                 else:
                     print(
@@ -27,14 +31,14 @@ class BotSMA(Antrade):
                 if data.FastSMA.iloc[-1] < data.SlowSMA.iloc[-1] \
                 and data.FastSMA.iloc[-1] >= data.SlowSMA.iloc[-2]:
                     self.place_order('SELL')
-                    open_position = False
-                elif data.FastSMA.iloc[-1] < data.CloweSMA.iloc[-1] \
-                and data.FastSMA.iloc[-1] > data.CloseSMA.iloc[-2]:
-                    message = self.symbol + ' Закрыть '
+                    sell_price = float(self.order.get('fills')[0]['price'])
+                    result = round(((sell_price - buy_price) * self.quantity()), 3)    
+                    message = f'{self.symbol} Sell {self.strategy} {str(result)}'
                     self.send_message(message)
                     print(message)
+                    open_position = False
                 else:
-                    print(f'Open position {self.symbol} {str(self.quantity())}')
+                    print(f'Открыта позиция {self.symbol} {str(self.quantity())}')
 
             time.sleep(60)
 

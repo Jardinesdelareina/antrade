@@ -35,7 +35,7 @@ for i in range(len(df)):
         if open_position == False:
             buys.append(i)
             open_position = True
-    if df.FastSMA.iloc[i] < df.SlowSMA[i]:
+    if df.FastSMA[i] < df.SlowSMA[i]:
         if open_position:
             sells.append(i)
             open_position = False

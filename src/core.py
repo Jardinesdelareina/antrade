@@ -27,8 +27,7 @@ class Antrade:
         df.index = pd.to_datetime(df.index, unit='ms')
         df = df.astype(float)
         df['FastSMA'] = df.Close.rolling(window=3).mean()
-        df['SlowSMA'] = df.Close.rolling(window=100).mean()
-        df['CloseSMA'] = df.Close.rolling(window=50).mean()
+        df['SlowSMA'] = df.Close.rolling(window=200).mean()
         df['HadgeSMA'] = df.Close.rolling(window=6).mean()
         return df
 
@@ -52,17 +51,8 @@ class Antrade:
     def place_order(self, order_type):
         # Открытие ордера
         if order_type == 'BUY':
-            order = CLIENT.create_order(symbol=self.symbol, side='BUY', type='MARKET', quantity=self.quantity())
-            #buy_price = float(order.get('fills')[0]['price'])
-            message = f'{self.symbol} Buy {self.strategy}'
-            self.send_message(message)
-            print(message)
-            print(json.dumps(order, indent=4, sort_keys=True))
+            self.order = CLIENT.create_order(symbol=self.symbol, side='BUY', type='MARKET', quantity=self.quantity())
+            print(json.dumps(self.order, indent=4, sort_keys=True))
         if order_type == 'SELL':
-            order = CLIENT.create_order(symbol=self.symbol, side='SELL', type='MARKET', quantity=self.quantity())
-            #sell_price = float(order.get('fills')[0]['price'])
-            #result = round((sell_price - buy_price) * self.quantity())    
-            message = f'{self.symbol} Sell {self.strategy}'
-            self.send_message(message)
-            print(message)
-            print(json.dumps(order, indent=4, sort_keys=True))
+            self.order = CLIENT.create_order(symbol=self.symbol, side='SELL', type='MARKET', quantity=self.quantity())
+            print(json.dumps(self.order, indent=4, sort_keys=True))
