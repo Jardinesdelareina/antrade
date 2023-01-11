@@ -1,4 +1,4 @@
-from config import CLIENT
+from src.config import CLIENT
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -7,7 +7,7 @@ symbol = 'XRPUSDT'
 interval = '5m'
 
 # Получение исторических данных
-df = pd.DataFrame(CLIENT.get_historical_klines(symbol, interval, '1 Dec, 2022', '31 Dec, 2022'))
+df = pd.DataFrame(CLIENT.get_historical_klines(symbol, interval, '30 Dec, 2022', '31 Dec, 2022'))
 df = df.iloc[:,:5]
 df.columns = ['Time', 'Open', 'High', 'Low', 'Close']
 df = df.set_index('Time')
