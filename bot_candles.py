@@ -1,10 +1,12 @@
 from src.core import Antrade
+from src.symbols import tickers
 import time
 
 
 class BotCandles(Antrade):
     # Стратегия: бычье поглощение
     strategy = 'Бычье поглощение'
+    
 
     def main(self, open_position=False):
         while True:

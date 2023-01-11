@@ -15,11 +15,11 @@ class Antrade:
     def get_data(self):
     # Получение данных
         try:
-            df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, self.interval, '1000m UTC'))
+            df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, '1m', '1000m UTC'))
         except:
             print(bae)
             time.sleep(30)
-            df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, self.interval, '1000m UTC'))
+            df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, '1m', '1000m UTC'))
 
         df = df.iloc[:,:6]
         df.columns = ['Time', 'Open', 'High', 'Low', 'Close', 'Volume']
