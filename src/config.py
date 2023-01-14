@@ -1,5 +1,5 @@
 from binance.client import Client
-import environs, json
+import environs
 
 env = environs.Env()
 env.read_env('.env')
