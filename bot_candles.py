@@ -1,5 +1,4 @@
 from src.core import Antrade
-from src.symbols import tickers
 import time
 
 
