@@ -66,8 +66,10 @@ async def get_interface(message: types.Message):
 @dp.callback_query_handler()
 async def interface_callback(callback: types.CallbackQuery):
     if callback.data == 'candles':
+        await callback.answer('Бычье поглощение online')
         await candles.main()
     if callback.data == 'sma':
+        await callback.answer('Пересечение sma online')
         await sma.main()
 
 executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
