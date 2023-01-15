@@ -78,3 +78,6 @@ class BotSMA(Antrade):
                     print(f'Открыта позиция {self.symbol} {str(self.quantity())}')
 
             time.sleep(60)
+
+candles = BotCandles('BTCUSDT', '1m', 20)
+sma = BotSMA('BTCUSDT', '1m', 20)
