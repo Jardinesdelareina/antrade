@@ -11,8 +11,11 @@ button_help = KeyboardButton('/help')
 button_description = KeyboardButton('/description')
 kb.add(button_help).add(button_description)
 
+async def on_startup(_):
+    print('Online')
+
 @dp.message_handler(commands=['start'])
-async def desc_command(message: types.Message):
+async def get_start(message: types.Message):
     await bot.send_message(
         chat_id=message.from_user.id, 
         text=START, 
@@ -22,7 +25,7 @@ async def desc_command(message: types.Message):
     await message.delete()
 
 @dp.message_handler(commands=['help'])
-async def help_command(message: types.Message):
+async def get_help(message: types.Message):
     await bot.send_message(
         chat_id=message.from_user.id, 
         text=HELP_COMMAND, 
@@ -31,7 +34,7 @@ async def help_command(message: types.Message):
     await message.delete()
 
 @dp.message_handler(commands=['description'])
-async def desc_command(message: types.Message):
+async def get_description(message: types.Message):
     await bot.send_message(
         chat_id=message.from_user.id, 
         text=DESCRIPTION, 
@@ -39,4 +42,4 @@ async def desc_command(message: types.Message):
     )
     await message.delete()
 
-executor.start_polling(dp, skip_updates=True)
+executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
