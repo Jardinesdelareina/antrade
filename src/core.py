@@ -31,12 +31,21 @@ class Antrade:
         df['HadgeSMA'] = df.Close.rolling(window=6).mean()
         return df
 
-    def send_message(self, message):
+    def send_message(self, order_type, message):
         # Алерт в Telegram
-        return requests.get(
-            'https://api.telegram.org/bot{}/sendMessage'.format(TELETOKEN), 
-            params=dict(chat_id=CHAT_ID, text=message)
-        )
+        url = 'https://api.telegram.org/bot{}/sendMessage'
+        reply = json.dumps({'inline_keyboard': [[dict(text='SELL', callback_data=self.place_order('SELL'))]]})
+
+        if order_type == 'BUY':
+            return requests.get(
+                url.format(TELETOKEN), 
+                params=dict(chat_id=CHAT_ID, text=message, reply_markup=reply)
+            )
+        if order_type == 'SELL':
+            return requests.get(
+                url.format(TELETOKEN), 
+                params=dict(chat_id=CHAT_ID, text=message)
+            )
 
     def calculate_quantity(self) -> float:
         # Рассчет объема ордера

@@ -6,8 +6,8 @@ class BotCandles(Antrade):
     # Стратегия: бычье поглощение
     strategy = 'Бычье поглощение'
     
-    def main(self, bot, open_position=False):
-        while bot == True:
+    def main(self, open_position=False):
+        while True:
             data = self.get_data()
 
             if not open_position:
@@ -34,8 +34,8 @@ class BotSMA(Antrade):
     # Стратегия: пересечение скользящих средних
     strategy = 'Пересечение SMA'
 
-    def main(self, bot, open_position=False):
-        while bot == True:
+    def main(self, open_position=False):
+        while True:
             data = self.get_data()
 
             if not open_position:
@@ -63,3 +63,5 @@ class BotSMA(Antrade):
 
 candles = BotCandles('BTCUSDT', '1m', 20)
 sma = BotSMA('BTCUSDT', '1m', 20)
+
+candles.main()
