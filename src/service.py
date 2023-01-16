@@ -6,8 +6,8 @@ class BotCandles(Antrade):
     # Стратегия: бычье поглощение
     strategy = 'Бычье поглощение'
     
-    def main(self, open_position=False):
-        while True:
+    def main(self, bot, open_position=False):
+        while bot == True:
             data = self.get_data()
 
             if not open_position:
@@ -34,8 +34,8 @@ class BotSMA(Antrade):
     # Стратегия: пересечение скользящих средних
     strategy = 'Пересечение SMA'
 
-    def main(self, open_position=False):
-        while True:
+    def main(self, bot, open_position=False):
+        while bot == True:
             data = self.get_data()
 
             if not open_position:

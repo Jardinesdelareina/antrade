@@ -1,4 +1,4 @@
-HELP_COMMAND = '''
+HELP = '''
 <b>/help</b> - <em>Список команд</em>
 <b>/description</b> - <em>Описание проекта</em>
 <b>/start</b> - <em>Включение интерфейса</em>
