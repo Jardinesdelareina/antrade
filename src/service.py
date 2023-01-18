@@ -27,7 +27,7 @@ class BotCandles(Antrade):
                 else:
                     print(f'Открыта позиция {self.symbol} {str(self.calculate_quantity())}')
 
-            time.sleep(60)
+            #time.sleep(60)
 
 
 class BotSMA(Antrade):
@@ -61,7 +61,7 @@ class BotSMA(Antrade):
 
             time.sleep(60)
 
-candles = BotCandles('BTCUSDT', '1m', 20)
+candles = BotCandles('XRPUSDT', '1m', 20)
 sma = BotSMA('BTCUSDT', '1m', 20)
 
 candles.main()

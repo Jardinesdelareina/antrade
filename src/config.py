@@ -9,5 +9,6 @@ CLIENT = Client(env('API_KEY'), env('SECRET_KEY'), {'verify': True, 'timeout': 2
 BALANCE = CLIENT.get_asset_balance(asset='USDT')
 
 # Telegram API
+URL_TELEGRAM = 'https://api.telegram.org/bot{}/sendMessage'
 TELETOKEN = env('TELETOKEN')
 CHAT_ID = env('CHAT_ID')
