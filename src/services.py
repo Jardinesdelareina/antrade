@@ -1,4 +1,4 @@
-from core import Antrade
+from .core import Antrade
 import time
 
 
@@ -58,6 +58,3 @@ class BotSMA(Antrade):
                     print(f'Открыта позиция {self.symbol} {str(self.calculate_quantity())}')
 
             time.sleep(60)
-
-sma = BotSMA('BTCUSDT', '1m', 20)
-sma.main()

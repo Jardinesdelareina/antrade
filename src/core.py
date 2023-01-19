@@ -1,4 +1,4 @@
-from config import CLIENT, CHAT_ID, TELETOKEN, URL_TELEGRAM
+from .config import CLIENT, CHAT_ID, TELETOKEN, URL_TELEGRAM
 import pandas as pd
 import requests, time, json
 from binance.exceptions import BinanceAPIException as bae
