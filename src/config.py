@@ -12,7 +12,3 @@ BALANCE = CLIENT.get_asset_balance(asset='USDT')
 URL_TELEGRAM = 'https://api.telegram.org/bot{}/sendMessage'
 TELETOKEN = env('TELETOKEN')
 CHAT_ID = env('CHAT_ID')
-
-# Celery
-CELERY_BROKER_URL = env('REDIS')
-CELERY_RESULT_BACKEND = env('REDIS')
