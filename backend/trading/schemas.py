@@ -1,14 +1,15 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 
 class GetListOrder(BaseModel):
     # Типизация списка ордеров
     id: int
-    order_id: str
+    order_id: int
     symbol: str
     side: str
     cummulative_quantity: float
+    commission: float
+    commission_asset: str
     price: float
     status: str
-    transaction_time: datetime
+    transaction_time: int

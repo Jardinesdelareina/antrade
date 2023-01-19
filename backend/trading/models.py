@@ -9,7 +9,7 @@ class Order(ormar.Model):
         tablename: str = 'Ордер'
 
     id: int = ormar.Integer(primary_key=True, autoincrement=True)
-    order_id: str = ormar.String(name='Идентификатор', max_length=22, unique=True)
+    order_id: int = ormar.Integer(name='Идентификатор', unique=True)
     symbol: str = ormar.String(name='Тикер', max_length=10)
     side: str = ormar.String(name='Направление', max_length=4)
     quantity: float = ormar.Float(name='Объем')
@@ -19,4 +19,4 @@ class Order(ormar.Model):
     price: float = ormar.Float(name='Цена')
     type: str = ormar.String(name='Тип ордера', max_length=50)
     status: str = ormar.String(name='Статус ордера', max_length=20)
-    transaction_time: datetime = ormar.DateTime(name='Время ордера', timezone=True, default=datetime.now)
+    #transaction_time: int = ormar.Integer(name='Время ордера')

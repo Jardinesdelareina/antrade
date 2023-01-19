@@ -23,4 +23,4 @@ async def shutdown() -> None:
     if database_.is_connected:
         await database_.disconnect()
 
-app.include_router(trading_router, prefix='/orders')
+app.include_router(trading_router)
