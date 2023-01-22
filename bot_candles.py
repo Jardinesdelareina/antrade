@@ -4,15 +4,17 @@ import time
 
 class BotCandles(Antrade):
     strategy = 'Бычье поглощение'
-    
-    def main(self, open_position=False):
 
+    def main(self, open_position=False):
         while True:
             df = self.get_data()
 
             # Цена выше/ниже SMA
-            trend_bull = df.Cloce.iloc[-1] > df.Hadge.iloc[-1]
-            trend_bear = df.Cloce.iloc[-1] < df.Hadge.iloc[-1]
+            trend_bull = df.Close.iloc[-1] > df.HadgeSMA.iloc[-1]
+            trend_bear = df.Close.iloc[-1] < df.HadgeSMA.iloc[-1]
+
+            past_candle_bull = df.Close.iloc[-2] < df.Open.iloc[-2]
+            past_candle_bear = df.Close.iloc[-2] < df.Open.iloc[-2]
 
             # Разница между телами свечей
             diff_candles = (df.Close.iloc[-2] + df.Open.iloc[-2]) - (df.Close.iloc[-1] + df.Open.iloc[-1])
@@ -24,28 +26,25 @@ class BotCandles(Antrade):
             diff_85 = diff_candles < ((df.Close.iloc[-2] + df.Open.iloc[-2]) / 100 * 15)
 
             # Бычье поглощение
-            bullish_eng = ((df.Close.iloc[-1] > df.Open.iloc[-2]) \
+            bullish_eng = ((df.Close.iloc[-1] >= df.Open.iloc[-2]) \
                 and (df.Open.iloc[-2] > df.Close.iloc[-2]))
 
             # Медвежье поглощение
-            bearish_eng = ((df.Close.iloc[-1] < df.Open.iloc[-2]) \
-                and (df.Open.iloc[-2] > df.Close.iloc[-2]))
+            bearish_eng = ((df.Close.iloc[-1] <= df.Open.iloc[-2]) \
+                and (df.Open.iloc[-2] < df.Close.iloc[-2]))
 
             if not open_position:
-                if trend_bull & (bullish_eng | diff_60):
+                if ((past_candle_bull & diff_60) | bullish_eng) & trend_bull:
                     self.place_order('BUY')
                     open_position = True
                 else:
                     print(self.strategy, self.symbol, self.calculate_quantity())
 
             if open_position:
-                if trend_bear & (bearish_eng | diff_85):
+                if ((past_candle_bear & diff_85) | bearish_eng) | trend_bear:
                     self.place_order('SELL')
                     open_position = False
                 else:
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
 
             time.sleep(60)
-
-candles = BotCandles('BTCUSDT', '1m', 20)
-candles.main()
