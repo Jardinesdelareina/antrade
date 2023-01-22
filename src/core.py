@@ -28,7 +28,7 @@ class Antrade:
         df = df.astype(float)
         df['FastSMA'] = df.Close.rolling(window=3).mean()
         df['SlowSMA'] = df.Close.rolling(window=200).mean()
-        df['HadgeSMA'] = df.Close.rolling(window=6).mean()
+        df['HadgeSMA'] = df.Close.rolling(window=50).mean()
         return df
 
     def send_message(self, message):
@@ -73,7 +73,7 @@ class Antrade:
             )
             sell_price = float(order.get('fills')[0]['price'])
             result = round(((sell_price - self.buy_price) * self.calculate_quantity()), 3)    
-            message = f'{self.symbol} Sell {self.strategy} {str(result)}'
+            message = f'{self.symbol} Sell {self.strategy} {str(sell_price)} Результат: {str(result)}'
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
