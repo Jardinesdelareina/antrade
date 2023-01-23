@@ -1,4 +1,4 @@
-from settings import CLIENT
+from src.config import CLIENT
 from tradingview_ta import TA_Handler, Interval
 import time
 

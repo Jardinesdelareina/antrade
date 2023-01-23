@@ -1,4 +1,4 @@
-from settings import CHAT_ID, TELETOKEN
+from src.config import CHAT_ID, TELETOKEN
 from dicts.symbols import symbols
 import time, requests
 from tradingview_ta import TA_Handler, Interval

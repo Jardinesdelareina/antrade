@@ -1,4 +1,4 @@
-from settings import CLIENT
+from src.config import CLIENT
 from binance.exceptions import BinanceAPIException as bae
 import pandas as pd
 import time

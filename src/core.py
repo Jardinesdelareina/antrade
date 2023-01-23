@@ -28,6 +28,7 @@ class Antrade:
         df = df.astype(float)
         df['FastSMA'] = df.Close.rolling(window=6).mean()
         df['SlowSMA'] = df.Close.rolling(window=100).mean()
+        df['HadgeSMA'] = df.Close.rolling(window=50).mean()
         return df
 
     def send_message(self, message):

@@ -1,4 +1,4 @@
-from settings import CLIENT, TELETOKEN, CHAT_ID
+from src.config import CLIENT, TELETOKEN, CHAT_ID
 from dicts.symbols import symbols
 from binance.exceptions import BinanceAPIException as bae
 import pandas as pd
