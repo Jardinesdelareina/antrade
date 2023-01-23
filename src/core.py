@@ -1,4 +1,4 @@
-from config import CLIENT, CHAT_ID, TELETOKEN, URL_TELEGRAM
+from .config import CLIENT, CHAT_ID, TELETOKEN, URL_TELEGRAM
 import pandas as pd
 import requests, time, json
 from binance.exceptions import BinanceAPIException as bae
@@ -28,7 +28,7 @@ class Antrade:
         df = df.astype(float)
         df['FastSMA'] = df.Close.rolling(window=6).mean()
         df['SlowSMA'] = df.Close.rolling(window=100).mean()
-        df['HadgeSMA'] = df.Close.rolling(window=50).mean()
+        df['HadgeSMA'] = df.Close.rolling(window=20).mean()
         return df
 
     def send_message(self, message):
