@@ -35,7 +35,3 @@ class BotCandles(Antrade):
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
 
             time.sleep(60)
-
-
-start = BotCandles('BTCUSDT', '1m', 20)
-start.main()
