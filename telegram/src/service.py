@@ -1,4 +1,4 @@
-from src.core import Antrade
+from .core import Antrade
 import time
 
 
