@@ -1,4 +1,6 @@
 from binance.client import Client
+from aiogram import Bot, Dispatcher
+
 import environs
 
 env = environs.Env()
@@ -13,3 +15,5 @@ BALANCE_FREE = round(float(ASSET_BALANCE.get('free')), 1)
 URL_TELEGRAM = 'https://api.telegram.org/bot{}/sendMessage'
 TELETOKEN = env('TELETOKEN')
 CHAT_ID = env('CHAT_ID')
+bot = Bot(TELETOKEN)
+dp = Dispatcher(bot)
