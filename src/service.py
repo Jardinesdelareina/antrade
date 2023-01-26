@@ -7,8 +7,10 @@ class BotTest(Antrade):
     def main(self):
         while True:
             if not self.open_position:
+                print('Покупка')
                 self.place_order('BUY')
             if self.open_position:
+                print('Продажа')
                 self.place_order('SELL')
 
             time.sleep(60)

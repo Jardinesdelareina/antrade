@@ -36,13 +36,7 @@ class Antrade:
         # Алерт в Telegram
         return requests.get(
             URL_TELEGRAM.format(TELETOKEN), 
-            params=dict(
-                chat_id=CHAT_ID, 
-                text=message,
-                reply_marcup=json.dumps({'inline_keyboard': [
-                    [dict(text='Закрыть позицию', callback_data=self.place_order('SELL'))]
-                ]})
-            )
+            params=dict(chat_id=CHAT_ID, text=message)
         )
 
     def calculate_quantity(self):
@@ -58,36 +52,30 @@ class Antrade:
     def place_order(self, order_type):
         # Открытие ордера
         if order_type == 'BUY':
-            try:
-                order = CLIENT.create_order(
-                    symbol=self.symbol, 
-                    side='BUY', 
-                    type='MARKET', 
-                    quantity=self.calculate_quantity(),
-                )
-                self.open_position = True
-                self.buy_price = (order.get('fills')[0]['price'])
-                message = f'{self.symbol} \n Buy \n {self.buy_price}'
-                self.send_message(message)
-                print(message)
-                print(json.dumps(order, indent=4, sort_keys=True))
-            except:
-                self.send_message(bae)
+            order = CLIENT.create_order(
+                symbol=self.symbol, 
+                side='BUY', 
+                type='MARKET', 
+                quantity=self.calculate_quantity(),
+            )
+            self.open_position = True
+            self.buy_price = (order.get('fills')[0]['price'])
+            message = f'{self.symbol} \n Buy \n {self.buy_price}'
+            self.send_message(message)
+            print(message)
+            print(json.dumps(order, indent=4, sort_keys=True))
 
         if order_type == 'SELL':
-            try:
-                order = CLIENT.create_order(
-                    symbol=self.symbol, 
-                    side='SELL', 
-                    type='MARKET', 
-                    quantity=self.calculate_quantity(),
-                )
-                self.open_position = False
-                sell_price = order.get('fills')[0]['price']
-                result = round(((float(sell_price) - float(self.buy_price)) * float(self.calculate_quantity())), 2)
-                message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result}'
-                self.send_message(message)
-                print(message)
-                print(json.dumps(order, indent=4, sort_keys=True))
-            except:
-                self.send_message(bae)
+            order = CLIENT.create_order(
+                symbol=self.symbol, 
+                side='SELL', 
+                type='MARKET', 
+                quantity=self.calculate_quantity(),
+            )
+            self.open_position = False
+            sell_price = order.get('fills')[0]['price']
+            result = round(((float(sell_price) - float(self.buy_price)) * float(self.calculate_quantity())), 2)
+            message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result}'
+            self.send_message(message)
+            print(message)
+            print(json.dumps(order, indent=4, sort_keys=True))
