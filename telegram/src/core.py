@@ -75,7 +75,7 @@ class Antrade:
             self.open_position = False
             sell_price = order.get('fills')[0]['price']
             result = round(((float(sell_price) - float(self.buy_price)) * float(self.calculate_quantity())), 2)
-            message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result}'
+            message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result} USDT'
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
