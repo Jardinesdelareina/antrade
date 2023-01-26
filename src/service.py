@@ -4,21 +4,19 @@ import time
 
 class BotTest(Antrade):
 
-    def main(self, open_position=False):
+    def main(self):
         while True:
-            if not open_position:
+            if not self.open_position:
                 self.place_order('BUY')
-                open_position = True
-            if open_position:
+            if self.open_position:
                 self.place_order('SELL')
-                open_position = False
 
-            time.sleep(2)
+            time.sleep(60)
 
 
 class BotSMA(Antrade):
 
-    def main(self, open_position=False):
+    def main(self):
         while True:
             df = self.get_data()
 
@@ -28,19 +26,17 @@ class BotSMA(Antrade):
             trend_bear = (df.FastSMA.iloc[-1] < df.SlowSMA.iloc[-1]) \
                 and (df.FastSMA.iloc[-2] > df.SlowSMA.iloc[-2])
 
-            if not open_position:
+            if not self.open_position:
                 if trend_bull:
                     self.place_order('BUY')
-                    open_position = True
                 else:
                     print(self.symbol, df.Close.iloc[-1])
 
-            if open_position:
+            if self.open_position:
                 if trend_bear:
                     self.place_order('SELL')
-                    open_position = False
                 else:
-                    print(f'Открыта позиция {self.symbol} {str(self.calculate_quantity())}')
+                    print(f'Открыта позиция {self.symbol} {self.calculate_quantity()}')
 
             time.sleep(60)
 
@@ -68,7 +64,7 @@ class BotCandles(Antrade):
                     self.place_order('BUY')
                     open_position = True
                 else:
-                    print(f'{self.symbol} {str(df.Close.iloc[-1])} Ожидание')
+                    print(f'{self.symbol} {df.Close.iloc[-1]} Ожидание')
 
             if open_position:
                 if bearish_eng | trend_bear:

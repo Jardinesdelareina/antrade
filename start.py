@@ -1,5 +1,5 @@
 from threading import Thread
-from src.service import BotSMA
+from src.service import BotSMA, BotTest
 
 def btc():
     btc = BotSMA('BTCUSDT', '1m', 20)
@@ -13,3 +13,6 @@ thread_btc = Thread(target=btc)
 thread_bnb = Thread(target=bnb)
 thread_btc.start()
 thread_bnb.start()
+
+""" test = BotTest('BTCUSDT', '1m', 20)
+test.main() """

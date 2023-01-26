@@ -7,10 +7,11 @@ from binance.helpers import round_step_size
 
 class Antrade:
 
-    def __init__(self, symbol, interval, qnty):
+    def __init__(self, symbol, interval, qnty, open_position=False):
         self.symbol = symbol
         self.interval = interval
         self.qnty = qnty
+        self.open_position = open_position
 
     def get_data(self):
     # Получение данных
@@ -35,7 +36,13 @@ class Antrade:
         # Алерт в Telegram
         return requests.get(
             URL_TELEGRAM.format(TELETOKEN), 
-            params=dict(chat_id=CHAT_ID, text=message)
+            params=dict(
+                chat_id=CHAT_ID, 
+                text=message,
+                reply_marcup=json.dumps({'inline_keyboard': [
+                    [dict(text='Закрыть позицию', callback_data=self.place_order('SELL'))]
+                ]})
+            )
         )
 
     def calculate_quantity(self):
@@ -58,6 +65,7 @@ class Antrade:
                     type='MARKET', 
                     quantity=self.calculate_quantity(),
                 )
+                self.open_position = True
                 self.buy_price = (order.get('fills')[0]['price'])
                 message = f'{self.symbol} \n Buy \n {self.buy_price}'
                 self.send_message(message)
@@ -74,6 +82,7 @@ class Antrade:
                     type='MARKET', 
                     quantity=self.calculate_quantity(),
                 )
+                self.open_position = False
                 sell_price = order.get('fills')[0]['price']
                 result = round(((float(sell_price) - float(self.buy_price)) * float(self.calculate_quantity())), 2)
                 message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result}'
