@@ -1,5 +1,6 @@
 from binance.client import Client
 from aiogram import Bot, Dispatcher
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 import environs
 
@@ -15,5 +16,7 @@ BALANCE_FREE = round(float(ASSET_BALANCE.get('free')), 1)
 URL_TELEGRAM = 'https://api.telegram.org/bot{}/sendMessage'
 TELETOKEN = env('TELETOKEN')
 CHAT_ID = env('CHAT_ID')
+
+# Aiogram Settings
 bot = Bot(TELETOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=MemoryStorage())

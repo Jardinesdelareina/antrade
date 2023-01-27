@@ -1,16 +1,7 @@
-from aiogram.types import (
-    ReplyKeyboardMarkup, 
-    KeyboardButton,
-)
 from aiogram import types, Dispatcher
 from .src.config import CHAT_ID, bot
 from .helpers import START, DESCRIPTION, BALANCE
-
-welcome_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-btn_description = KeyboardButton('Описание проекта')
-btn_balance = KeyboardButton('Баланс')
-btn_trading = KeyboardButton('Трейдинг')
-welcome_kb.add(btn_description).insert(btn_balance).insert(btn_trading)
+from .keyboards import welcome_kb
 
 async def get_start(message: types.Message):
     await bot.send_message(chat_id=CHAT_ID, text=START, parse_mode="HTML", reply_markup=welcome_kb)

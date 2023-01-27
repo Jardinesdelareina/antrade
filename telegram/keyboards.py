@@ -1,0 +1,48 @@
+from aiogram.types import (
+    ReplyKeyboardMarkup, 
+    KeyboardButton,
+    InlineKeyboardMarkup, 
+    InlineKeyboardButton,
+)
+
+# Главное меню
+welcome_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+btn_description = KeyboardButton('Описание проекта')
+btn_balance = KeyboardButton('Баланс')
+btn_algorithms = KeyboardButton('Алгоритмы')
+welcome_kb.add(btn_description).row(btn_balance, btn_algorithms)
+
+# Меню выбора алгоритма
+algorithms_kb = InlineKeyboardMarkup(row_width=2)
+algorithms_candles = InlineKeyboardButton(text='Candles', callback_data='Сandles')
+algorithms_sma = InlineKeyboardButton(text='SMA', callback_data='SMA')
+algorithms_macd = InlineKeyboardButton(text='MACD', callback_data='MACD')
+algorithms_kb.add(algorithms_candles).add(algorithms_sma).add(algorithms_macd)
+
+# Меню выбора тикера
+symbol_kb = InlineKeyboardMarkup(row_width=3)
+symbol_btc = InlineKeyboardButton(text='BTC', callback_data='BTCUSDT')
+symbol_eth = InlineKeyboardButton(text='ETH', callback_data='ETHUSDT')
+symbol_bnb = InlineKeyboardButton(text='BNB', callback_data='BNBUSDT')
+symbol_xrp = InlineKeyboardButton(text='XRP', callback_data='XRPUSDT')
+symbol_ada = InlineKeyboardButton(text='ADA', callback_data='ADAUSDT')
+symbol_dot = InlineKeyboardButton(text='DOT', callback_data='DOTUSDT')
+symbol_matic = InlineKeyboardButton(text='MATIC', callback_data='MATICUSDT')
+symbol_avax = InlineKeyboardButton(text='AVAX', callback_data='AVAXUSDT')
+symbol_trx = InlineKeyboardButton(text='TRX', callback_data='TRXUSDT')
+symbol_kb.row(symbol_btc, symbol_eth, symbol_bnb)\
+    .row(symbol_xrp, symbol_ada, symbol_dot)\
+    .row(symbol_matic, symbol_avax, symbol_trx)
+
+# Меню выбора интервала
+interval_kb = InlineKeyboardMarkup(row_width=3)
+interval_1m = InlineKeyboardButton(text='1 минута', callback_data='1m')
+interval_5m = InlineKeyboardButton(text='5 минут', callback_data='5m')
+interval_15m = InlineKeyboardButton(text='15 минут', callback_data='15m')
+interval_30m = InlineKeyboardButton(text='30 минут', callback_data='30m')
+interval_1h = InlineKeyboardButton(text='1 час', callback_data='1h')
+interval_4h = InlineKeyboardButton(text='4 часа', callback_data='4h')
+interval_1d = InlineKeyboardButton(text='24 часа', callback_data='1d')
+interval_kb.row(interval_1m, interval_5m, interval_15m)\
+    .row(interval_30m, interval_1h, interval_4h)\
+    .insert(interval_1d)

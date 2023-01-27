@@ -1,5 +1,5 @@
 from threading import Thread
-from .service import BotSMA, BotTest
+from .algorithms import BotSMA, BotTest
 
 def btc():
     btc = BotSMA('BTCUSDT', '1m', 20)
