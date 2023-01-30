@@ -1,9 +1,10 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
+from aiogram.types import ReplyKeyboardRemove
 import asyncio
 from .src.config import bot, CHAT_ID, BALANCE_FREE
-from .src.algorithms import BotCandles, BotSMA
+from .src.algorithms import BotTest, BotCandles, BotSMA
 from .helpers import (
     STATE_ALGO,
     STATE_SYMBOL,
@@ -12,9 +13,10 @@ from .helpers import (
     STATE_QNTY_TYPE_ERROR,
     STATE_QNTY_VALUE_ERROR,
 )
-from .keyboards import algorithm_kb, symbol_kb, interval_kb, start_kb, close_kb
+from .keyboards import algorithm_kb, symbol_kb, interval_kb, start_kb, manage_kb
 from .states import TradeStateGroup
 
+# Пункт "Алгоритмы" главного меню, предлагает список алгоритмов
 async def get_algorithm(message: types.Message):
     await TradeStateGroup.algorithms.set()
     await bot.send_message(
@@ -25,9 +27,10 @@ async def get_algorithm(message: types.Message):
     )
     await message.delete()
 
+# Сохраняет алгоритм в стейт, предлагает список тикеров
 async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
-        data['algorithms'] = callback.data
+        data['algorithm'] = callback.data
         await TradeStateGroup.next()
     await bot.send_message(
         chat_id=CHAT_ID, 
@@ -36,6 +39,7 @@ async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=symbol_kb
     )
 
+# Сохраняет тикер в стейт, предлагает список интервалов
 async def symbol_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['symbol'] = callback.data
@@ -47,6 +51,7 @@ async def symbol_callback(callback: types.CallbackQuery, state: FSMContext):
             reply_markup=interval_kb
         )
 
+# Сохраняет интервал в стейт, предлагает ввести рабочий объем ордеров
 async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['interval'] = callback.data
@@ -54,9 +59,12 @@ async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
         await bot.send_message(
             chat_id=CHAT_ID, 
             text=STATE_QNTY, 
-            parse_mode="HTML"
+            parse_mode="HTML",
+            reply_markup=ReplyKeyboardRemove()
         )
 
+# Введенный объем проходит валидацию (числовое ли значение и мельше ли баланса),
+# сохраняется в стейт, выводит всю информацию из стейта и предлагает кнопку старта алгоритма
 async def qnty_callback(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         quantity = message.text
@@ -77,7 +85,7 @@ async def qnty_callback(message: types.Message, state: FSMContext):
                 text=STATE_QNTY_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-
+    
         algorithm = data['algorithm']
         symbol = data['symbol']
         interval = data['interval']
@@ -90,27 +98,29 @@ async def qnty_callback(message: types.Message, state: FSMContext):
             reply_markup=start_kb
         )
 
+# Сохраняет в стейт коллбэк 'start' и запускает алгоритм - в зависимости от параметров
+# вызывается экземпляр определенного алгоритма с параметрами из стейта
 async def start_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['start'] = callback.data
-        algorithm = data['algorithm']
-        STATE_START = f'{algorithm} online'
-        await callback.answer(STATE_START)
-        await bot.send_message(
-            chat_id=CHAT_ID, 
-            text=STATE_START,
-            reply_markup=close_kb
-        )
-
-async def close_callback(callback: types.CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        data['close'] = callback.data
-        
-
-async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        data['stop'] = callback.data
-        
+        if data['start'] == 'start':
+            candles_start = BotCandles(data['symbol'], data['interval'], data['qnty'])
+            sma_start = BotSMA(data['symbol'], data['interval'], data['qnty'])
+            test_start = BotTest(data['symbol'], data['interval'], data['qnty'])
+            algorithm = data['algorithm']
+            STATE_START = f'{algorithm} online'
+            await callback.answer(STATE_START)
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text=STATE_START,
+                reply_markup=manage_kb
+            )
+            if data['algorithm'] == 'Test':
+                await test_start.main(work=True)
+            elif data['algorithm'] == 'Candles':
+                await candles_start.main(work=True)
+            elif data['algorithm'] == 'SMA':
+                await sma_start.main(work=True)
         await state.finish()
 
 async def cancel_handler(message: types.Message, state: FSMContext):
@@ -127,7 +137,7 @@ def register_handlers_trading(dp: Dispatcher):
     dp.register_callback_query_handler(interval_callback, state=TradeStateGroup.interval)
     dp.register_message_handler(qnty_callback, state=TradeStateGroup.qnty)
     dp.register_callback_query_handler(start_callback, state=TradeStateGroup.start)
-    dp.register_callback_query_handler(close_callback, state=TradeStateGroup.close)
-    dp.register_callback_query_handler(stop_callback, state=TradeStateGroup.stop)
+    #dp.register_callback_query_handler(close_callback, state=TradeStateGroup.close)
+    #dp.register_callback_query_handler(stop_callback, state=TradeStateGroup.stop)
     dp.register_message_handler(cancel_handler, state="*", text='Отмена')
     dp.register_message_handler(cancel_handler, Text(equals='Отмена', ignore_case=True), state="*")

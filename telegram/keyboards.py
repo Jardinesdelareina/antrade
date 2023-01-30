@@ -13,11 +13,11 @@ main_algorithms = KeyboardButton('Алгоритмы')
 main_kb.add(main_description).row(main_balance, main_algorithms)
 
 # Меню выбора алгоритма
-algorithms_kb = InlineKeyboardMarkup(row_width=2)
-algorithms_candles = InlineKeyboardButton(text='Candles', callback_data='Сandles')
-algorithms_sma = InlineKeyboardButton(text='SMA', callback_data='SMA')
-algorithms_macd = InlineKeyboardButton(text='MACD', callback_data='MACD')
-algorithms_kb.add(algorithms_candles).add(algorithms_sma).add(algorithms_macd)
+algorithm_kb = InlineKeyboardMarkup(row_width=2)
+algorithm_test = InlineKeyboardButton(text='Test', callback_data='Test')
+algorithm_candles = InlineKeyboardButton(text='Candles', callback_data='Сandles')
+algorithm_sma = InlineKeyboardButton(text='SMA', callback_data='SMA')
+algorithm_kb.add(algorithm_test).add(algorithm_candles).add(algorithm_sma)
 
 # Меню выбора тикера
 symbol_kb = InlineKeyboardMarkup(row_width=3)
@@ -55,4 +55,5 @@ start_kb.add(start_bot)
 manage_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 manage_close = KeyboardButton('Закрыть позицию')
 manage_stop = KeyboardButton('Выключить алгоритм')
-manage_kb.row(manage_close, manage_stop)
+manage_return = KeyboardButton('Вернуться в главное меню')
+manage_kb.row(manage_close, manage_stop).add(manage_return)

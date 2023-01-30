@@ -4,9 +4,10 @@ import time
 
 class BotTest(Antrade):
 
-    def main(self, work):
+    def main(self, work=True):
         while work==True:
             if not self.open_position:
+                time.sleep(30)
                 print('Покупка')
                 self.place_order('BUY')
             if self.open_position:
@@ -19,7 +20,7 @@ class BotTest(Antrade):
 
 class BotSMA(Antrade):
 
-    def main(self, work):
+    def main(self, work=True):
         while work==True:
             df = self.get_data()
 
@@ -46,7 +47,7 @@ class BotSMA(Antrade):
 
 class BotCandles(Antrade):
 
-    def main(self, work):
+    def main(self, work=True):
         while work==True:
             df = self.get_data()
 
