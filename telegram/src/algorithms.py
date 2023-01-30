@@ -5,6 +5,7 @@ import time
 class BotTest(Antrade):
 
     def main(self, work=True):
+        print('Start')
         while work==True:
             if not self.open_position:
                 time.sleep(30)
@@ -18,36 +19,10 @@ class BotTest(Antrade):
             time.sleep(10)
 
 
-class BotSMA(Antrade):
-
-    def main(self, work=True):
-        while work==True:
-            df = self.get_data()
-
-            trend_bull = (df.FastSMA.iloc[-1] > df.SlowSMA.iloc[-1]) \
-                and (df.FastSMA.iloc[-2] < df.SlowSMA.iloc[-2])
-
-            trend_bear = (df.FastSMA.iloc[-1] < df.SlowSMA.iloc[-1]) \
-                and (df.FastSMA.iloc[-2] > df.SlowSMA.iloc[-2])
-
-            if not self.open_position:
-                if trend_bull:
-                    self.place_order('BUY')
-                else:
-                    print(self.symbol, df.Close.iloc[-1])
-
-            if self.open_position:
-                if trend_bear:
-                    self.place_order('SELL')
-                else:
-                    print(f'Открыта позиция {self.symbol} {self.calculate_quantity()}')
-
-            time.sleep(60)
-
-
 class BotCandles(Antrade):
 
     def main(self, work=True):
+        print('Start')
         while work==True:
             df = self.get_data()
 
@@ -74,5 +49,34 @@ class BotCandles(Antrade):
                     self.place_order('SELL')
                 else:
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
+
+            time.sleep(60)
+
+
+
+class BotSMA(Antrade):
+
+    def main(self, work=True):
+        print('Start')
+        while work==True:
+            df = self.get_data()
+
+            trend_bull = (df.FastSMA.iloc[-1] > df.SlowSMA.iloc[-1]) \
+                and (df.FastSMA.iloc[-2] < df.SlowSMA.iloc[-2])
+
+            trend_bear = (df.FastSMA.iloc[-1] < df.SlowSMA.iloc[-1]) \
+                and (df.FastSMA.iloc[-2] > df.SlowSMA.iloc[-2])
+
+            if not self.open_position:
+                if trend_bull:
+                    self.place_order('BUY')
+                else:
+                    print(f'{self.symbol}, {df.Close.iloc[-1]}, Ожидание')
+
+            if self.open_position:
+                if trend_bear:
+                    self.place_order('SELL')
+                else:
+                    print(f'Открыта позиция {self.symbol} {self.calculate_quantity()}')
 
             time.sleep(60)
