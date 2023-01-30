@@ -7,3 +7,4 @@ class TradeStateGroup(StatesGroup):
     symbol = State()
     interval = State()
     qnty = State()
+    start = State()

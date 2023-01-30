@@ -6,11 +6,11 @@ from aiogram.types import (
 )
 
 # Главное меню
-welcome_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-btn_description = KeyboardButton('Описание проекта')
-btn_balance = KeyboardButton('Баланс')
-btn_algorithms = KeyboardButton('Алгоритмы')
-welcome_kb.add(btn_description).row(btn_balance, btn_algorithms)
+main_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+main_description = KeyboardButton('Описание проекта')
+main_balance = KeyboardButton('Баланс')
+main_algorithms = KeyboardButton('Алгоритмы')
+main_kb.add(main_description).row(main_balance, main_algorithms)
 
 # Меню выбора алгоритма
 algorithms_kb = InlineKeyboardMarkup(row_width=2)
@@ -46,3 +46,13 @@ interval_1d = InlineKeyboardButton(text='24 часа', callback_data='1d')
 interval_kb.row(interval_1m, interval_5m, interval_15m)\
     .row(interval_30m, interval_1h, interval_4h)\
     .insert(interval_1d)
+
+# Интерфейс управления ордерами
+start_kb = InlineKeyboardMarkup(row_width=1)
+start_bot = InlineKeyboardButton(text='Старт', callback_data='start')
+start_kb.add(start_bot)
+
+manage_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+manage_close = KeyboardButton('Закрыть позицию')
+manage_stop = KeyboardButton('Выключить алгоритм')
+manage_kb.row(manage_close, manage_stop)

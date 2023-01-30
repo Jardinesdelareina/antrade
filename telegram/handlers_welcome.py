@@ -1,10 +1,10 @@
 from aiogram import types, Dispatcher
 from .src.config import CHAT_ID, bot
 from .helpers import START, DESCRIPTION, BALANCE
-from .keyboards import welcome_kb
+from .keyboards import main_kb
 
 async def get_start(message: types.Message):
-    await bot.send_message(chat_id=CHAT_ID, text=START, parse_mode="HTML", reply_markup=welcome_kb)
+    await bot.send_message(chat_id=CHAT_ID, text=START, parse_mode="HTML", reply_markup=main_kb)
     await message.delete()
 
 async def get_description(message: types.Message):
