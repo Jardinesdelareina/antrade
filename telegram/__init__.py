@@ -1,2 +1,2 @@
-from telegram import handlers_trading
-from telegram import handlers_welcome
+from telegram.handlers import trading
+from telegram.handlers import welcome

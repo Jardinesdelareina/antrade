@@ -1,7 +1,7 @@
 from aiogram import types, Dispatcher
-from .src.config import CHAT_ID, bot
-from .helpers import START, DESCRIPTION, BALANCE
-from .keyboards import main_kb
+from ..config_telegram import CHAT_ID, bot
+from ..helpers import START, DESCRIPTION, BALANCE
+from ..keyboards import main_kb
 
 # Вызывает главное меню
 async def get_start(message: types.Message):

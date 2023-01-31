@@ -1,4 +1,5 @@
-from .config import CLIENT, CHAT_ID, TELETOKEN, URL_TELEGRAM
+from .config_binance import CLIENT
+from telegram.config_telegram import CHAT_ID, TELETOKEN
 import pandas as pd
 import requests, time, json
 from binance.exceptions import BinanceAPIException as bae
@@ -35,7 +36,7 @@ class Antrade:
     def send_message(self, message):
         # Алерт в Telegram
         return requests.get(
-            URL_TELEGRAM.format(TELETOKEN), 
+            'https://api.telegram.org/bot{}/sendMessage'.format(TELETOKEN), 
             params=dict(chat_id=CHAT_ID, text=message)
         )
 

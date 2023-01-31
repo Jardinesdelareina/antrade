@@ -1,4 +1,4 @@
-from .src.config import BALANCE_FREE
+from service.config_binance import BALANCE_FREE
 
 DESCRIPTION = '''
 <em>
@@ -42,7 +42,6 @@ START = '''
 
 BALANCE = f'Баланс: <b>{BALANCE_FREE}</b> USDT'
 
-
 STATE_ALGO = '''
 В данном меню вы можете выбрать алгоритмы для начала вашей торговой сессии:
 '''
@@ -67,7 +66,6 @@ STATE_QNTY_TYPE_ERROR = '''
 </em>
 '''
 STATE_QNTY_VALUE_ERROR = f'Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{BALANCE_FREE}:</b>'
-
 STATE_VALID_ERROR = '''
 <em>
 Данные заполнены неверно, попробуйте еще раз, пожалуйста.

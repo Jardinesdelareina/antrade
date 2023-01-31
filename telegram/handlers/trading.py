@@ -3,10 +3,10 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from .src.config import bot, CHAT_ID, BALANCE_FREE
-from .src.algorithms import BotTest, BotCandles, BotSMA
-from .helpers import *
-from .keyboards import main_kb, algorithm_kb, symbol_kb, interval_kb, start_kb
+from service.algorithms import BotTest, BotCandles, BotSMA
+from ..config_telegram import bot, CHAT_ID
+from ..helpers import *
+from ..keyboards import main_kb, algorithm_kb, symbol_kb, interval_kb, start_kb
 
 
 class TradeStateGroup(StatesGroup):
