@@ -15,7 +15,7 @@ main_kb.add(main_description).row(main_balance, main_algorithms)
 # Меню выбора алгоритма
 algorithm_kb = InlineKeyboardMarkup(row_width=2)
 algorithm_test = InlineKeyboardButton(text='Test', callback_data='Test')
-algorithm_candles = InlineKeyboardButton(text='Candles', callback_data='Сandles')
+algorithm_candles = InlineKeyboardButton(text='Candles', callback_data='Candles')
 algorithm_sma = InlineKeyboardButton(text='SMA', callback_data='SMA')
 algorithm_kb.add(algorithm_test).add(algorithm_candles).add(algorithm_sma)
 
@@ -47,13 +47,7 @@ interval_kb.row(interval_1m, interval_5m, interval_15m)\
     .row(interval_30m, interval_1h, interval_4h)\
     .insert(interval_1d)
 
-# Интерфейс управления ордерами
+# Кнопка запуска алгоритма
 start_kb = InlineKeyboardMarkup(row_width=1)
 start_bot = InlineKeyboardButton(text='Старт', callback_data='start')
 start_kb.add(start_bot)
-
-manage_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-manage_close = KeyboardButton('Закрыть позицию')
-manage_stop = KeyboardButton('Выключить алгоритм')
-manage_return = KeyboardButton('Вернуться в главное меню')
-manage_kb.row(manage_close, manage_stop).add(manage_return)

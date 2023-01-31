@@ -8,7 +8,7 @@ class BotTest(Antrade):
         print('Start')
         while work==True:
             if not self.open_position:
-                time.sleep(30)
+                time.sleep(5)
                 print('Покупка')
                 self.place_order('BUY')
             if self.open_position:
