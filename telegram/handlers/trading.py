@@ -157,6 +157,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 algorithm = data['algorithm']
                 STATE_START = f'{algorithm} online'
                 await callback.answer(STATE_START)
+                await TradeStateGroup.next()
                 await bot.send_message(
                     chat_id=CHAT_ID, 
                     text=STATE_START,
@@ -167,8 +168,6 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                     start.main()
                 thread_work = threading.Thread(target=work)
                 thread_work.start()
-
-                await state.finish()
         except:
             await state.finish()
             await bot.send_message(
@@ -178,8 +177,10 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
-async def stop_callback(state: FSMContext):
+async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
+        data['stop'] = callback.data
+        if data['stop'] == 'stop':
             bot_off()
             algorithm = data['algorithm']
             STATE_STOP = f'{algorithm} offline'
