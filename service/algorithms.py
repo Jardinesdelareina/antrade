@@ -1,12 +1,19 @@
 from .core import Antrade
 import time
 
+work = True
+
+def bot_off():
+    global work
+    work = False
+
 
 class BotTest(Antrade):
 
-    def main(self, work=True):
+    def main(self):
+        global work
         print('Start')
-        while work==True:
+        while work:
             if not self.open_position:
                 time.sleep(5)
                 print('Покупка')
@@ -21,9 +28,10 @@ class BotTest(Antrade):
 
 class BotCandles(Antrade):
 
-    def main(self, work=True):
+    def main(self):
+        global work
         print('Start')
-        while work==True:
+        while work:
             df = self.get_data()
 
             # Цена выше/ниже SMA
@@ -50,15 +58,16 @@ class BotCandles(Antrade):
                 else:
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
 
-            time.sleep(60)
+            time.sleep(5)
 
 
 
 class BotSMA(Antrade):
 
-    def main(self, work=True):
+    def main(self):
+        global work
         print('Start')
-        while work==True:
+        while work:
             df = self.get_data()
 
             trend_bull = (df.FastSMA.iloc[-1] > df.SlowSMA.iloc[-1]) \
@@ -71,7 +80,7 @@ class BotSMA(Antrade):
                 if trend_bull:
                     self.place_order('BUY')
                 else:
-                    print(f'{self.symbol}, {df.Close.iloc[-1]}, Ожидание')
+                    print(f'{self.symbol} {df.Close.iloc[-1]} Ожидание')
 
             if self.open_position:
                 if trend_bear:
@@ -79,4 +88,4 @@ class BotSMA(Antrade):
                 else:
                     print(f'Открыта позиция {self.symbol} {self.calculate_quantity()}')
 
-            time.sleep(60)
+            time.sleep(5)

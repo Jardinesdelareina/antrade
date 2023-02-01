@@ -51,3 +51,8 @@ interval_kb.row(interval_1m, interval_5m, interval_15m)\
 start_kb = InlineKeyboardMarkup(row_width=1)
 start_bot = InlineKeyboardButton(text='Старт', callback_data='start')
 start_kb.add(start_bot)
+
+# Кнопка остановки алгоритма
+stop_kb = InlineKeyboardMarkup(row_width=1)
+stop_bot = InlineKeyboardButton(text='Стоп', callback_data='stop')
+stop_kb.add(stop_bot)

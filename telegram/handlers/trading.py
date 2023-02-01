@@ -1,21 +1,23 @@
+import threading
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from service.algorithms import BotTest, BotCandles, BotSMA
+from service.algorithms import BotTest, BotCandles, BotSMA, bot_off
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
-from ..keyboards import main_kb, algorithm_kb, symbol_kb, interval_kb, start_kb
+from ..keyboards import main_kb, algorithm_kb, symbol_kb, interval_kb, start_kb, stop_kb
 
 
 class TradeStateGroup(StatesGroup):
-    # Состояние параметров: алгоритм, символ, таймфрейм, объем, старт алгоритма
+    # Состояние параметров: алгоритм, символ, таймфрейм, объем, старт/остановка алгоритма
     algorithm = State()
     symbol = State()
     interval = State()
     qnty = State()
     start = State()
+    stop = State()
 
 
 # Пункт "Алгоритмы" главного меню, предлагает список алгоритмов, начинает цикл стейта
@@ -146,22 +148,26 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
         try:
             data['start'] = callback.data
             if data['start'] == 'start':
-                test_start = BotTest(data['symbol'], data['interval'], data['qnty'])
-                candles_start = BotCandles(data['symbol'], data['interval'], data['qnty'])
-                sma_start = BotSMA(data['symbol'], data['interval'], data['qnty'])
+                if data['algorithm'] == 'Test':
+                    start = BotTest(data['symbol'], data['interval'], data['qnty'])
+                elif data['algorithm'] == 'Candles':
+                    start = BotCandles(data['symbol'], data['interval'], data['qnty'])
+                elif data['algorithm'] == 'SMA':
+                    start = BotSMA(data['symbol'], data['interval'], data['qnty'])
                 algorithm = data['algorithm']
                 STATE_START = f'{algorithm} online'
                 await callback.answer(STATE_START)
                 await bot.send_message(
                     chat_id=CHAT_ID, 
-                    text=STATE_START
+                    text=STATE_START,
+                    reply_markup=stop_kb
                 )
-                if data['algorithm'] == 'Test':
-                    await test_start.main(work=True)
-                if data['algorithm'] == 'Candles':
-                    await candles_start.main(work=True)
-                if data['algorithm'] == 'SMA':
-                    await sma_start.main(work=True)
+
+                def work():
+                    start.main()
+                thread_work = threading.Thread(target=work)
+                thread_work.start()
+
                 await state.finish()
         except:
             await state.finish()
@@ -172,6 +178,19 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
+async def stop_callback(state: FSMContext):
+    async with state.proxy() as data:
+            bot_off()
+            algorithm = data['algorithm']
+            STATE_STOP = f'{algorithm} offline'
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text=STATE_STOP, 
+                parse_mode="HTML",
+                reply_markup=main_kb
+            )
+            await state.finish()
+
 def register_handlers_trading(dp: Dispatcher):
     dp.register_message_handler(get_algorithm, text='Алгоритмы', state=None)
     dp.register_message_handler(cancel_handler, state="*", text='Отмена')
@@ -181,3 +200,4 @@ def register_handlers_trading(dp: Dispatcher):
     dp.register_callback_query_handler(interval_callback, state=TradeStateGroup.interval)
     dp.register_message_handler(qnty_message, state=TradeStateGroup.qnty)
     dp.register_callback_query_handler(start_callback, state=TradeStateGroup.start)
+    dp.register_callback_query_handler(stop_callback, state=TradeStateGroup.stop)

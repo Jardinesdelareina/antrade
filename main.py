@@ -1,7 +1,7 @@
 from aiogram import executor
-from telegram.handlers import trading
 from telegram.config_telegram import dp
 from telegram.handlers import welcome
+from telegram.handlers import trading
 
 async def on_startup(_):
     print('Online')
