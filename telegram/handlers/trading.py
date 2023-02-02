@@ -157,6 +157,11 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 elif algorithm == 'SMA':
                     state_data = BotSMA(data['symbol'], data['interval'], data['qnty'])
 
+                def work():
+                    state_data.main()
+                thread_work = threading.Thread(target=work)
+                thread_work.start()
+
                 STATE_START = f'{algorithm} online'
                 await callback.answer(STATE_START)
                 await TradeStateGroup.next()
@@ -165,12 +170,6 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                     text=STATE_START,
                     reply_markup=exit_kb
                 )
-
-                def work():
-                    state_data.main()
-                thread_work = threading.Thread(target=work)
-                thread_work.start()
-
         except:
             await state.finish()
             print('Error start handler')
