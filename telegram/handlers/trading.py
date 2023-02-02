@@ -147,14 +147,16 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         try:
             data['start'] = callback.data
+            algorithm = data['algorithm']
             if data['start'] == 'start':
-                if data['algorithm'] == 'Test':
-                    start = BotTest(data['symbol'], data['interval'], data['qnty'])
-                elif data['algorithm'] == 'Candles':
-                    start = BotCandles(data['symbol'], data['interval'], data['qnty'])
-                elif data['algorithm'] == 'SMA':
-                    start = BotSMA(data['symbol'], data['interval'], data['qnty'])
-                algorithm = data['algorithm']
+
+                if algorithm == 'Test':
+                    state_data = BotTest(data['symbol'], data['interval'], data['qnty'])
+                elif algorithm == 'Candles':
+                    state_data = BotCandles(data['symbol'], data['interval'], data['qnty'])
+                elif algorithm == 'SMA':
+                    state_data = BotSMA(data['symbol'], data['interval'], data['qnty'])
+
                 STATE_START = f'{algorithm} online'
                 await callback.answer(STATE_START)
                 await TradeStateGroup.next()
@@ -165,11 +167,13 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 )
 
                 def work():
-                    start.main()
+                    state_data.main()
                 thread_work = threading.Thread(target=work)
                 thread_work.start()
+
         except:
             await state.finish()
+            print('Error start handler')
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=ORDER_EXCEPTION,
@@ -180,16 +184,23 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
 async def stop_message(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         algorithm = data['algorithm']
-        STATE_STOP_MESSAGE = f'Вы хотите действительно хотите остановить {algorithm}?'
+        STATE_STOP_MESSAGE = f'Вы действительно хотите остановить {algorithm}?'
         await bot.send_message(chat_id=CHAT_ID, text=STATE_STOP_MESSAGE, parse_mode="HTML", reply_markup=stop_kb)
         await message.delete()
 
 async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['stop'] = callback.data
+        algorithm = data['algorithm']
+        if data['stop'] == 'continue':
+            STATE_CONTINUE = f'{algorithm} продолжает работу' 
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text=STATE_CONTINUE,
+                reply_markup=exit_kb
+            )
         if data['stop'] == 'stop':
             bot_off()
-            algorithm = data['algorithm']
             STATE_STOP = f'{algorithm} offline'
             print(algorithm, 'Stop')
             await bot.send_message(
