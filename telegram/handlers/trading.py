@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from service.algorithms import BotTest, BotCandles, BotSMA, bot_off
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
-from ..keyboards import main_kb, algorithm_kb, symbol_kb, interval_kb, start_kb, stop_kb
+from ..keyboards import *
 
 
 class TradeStateGroup(StatesGroup):
@@ -161,7 +161,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 await bot.send_message(
                     chat_id=CHAT_ID, 
                     text=STATE_START,
-                    reply_markup=stop_kb
+                    reply_markup=exit_kb
                 )
 
                 def work():
@@ -177,6 +177,13 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
+async def stop_message(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        algorithm = data['algorithm']
+        STATE_STOP_MESSAGE = f'Вы хотите действительно хотите остановить {algorithm}?'
+        await bot.send_message(chat_id=CHAT_ID, text=STATE_STOP_MESSAGE, parse_mode="HTML", reply_markup=stop_kb)
+        await message.delete()
+
 async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['stop'] = callback.data
@@ -184,6 +191,7 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
             bot_off()
             algorithm = data['algorithm']
             STATE_STOP = f'{algorithm} offline'
+            print(algorithm, 'Stop')
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_STOP, 
@@ -201,4 +209,5 @@ def register_handlers_trading(dp: Dispatcher):
     dp.register_callback_query_handler(interval_callback, state=TradeStateGroup.interval)
     dp.register_message_handler(qnty_message, state=TradeStateGroup.qnty)
     dp.register_callback_query_handler(start_callback, state=TradeStateGroup.start)
+    dp.register_message_handler(stop_message, state=TradeStateGroup.stop)
     dp.register_callback_query_handler(stop_callback, state=TradeStateGroup.stop)

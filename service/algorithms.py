@@ -12,6 +12,7 @@ class BotTest(Antrade):
 
     def main(self):
         global work
+        work = True
         print('Start')
         while work:
             if not self.open_position:
@@ -30,6 +31,7 @@ class BotCandles(Antrade):
 
     def main(self):
         global work
+        work = True
         print('Start')
         while work:
             df = self.get_data()
@@ -66,6 +68,7 @@ class BotSMA(Antrade):
 
     def main(self):
         global work
+        work = True
         print('Start')
         while work:
             df = self.get_data()
