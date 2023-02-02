@@ -5,13 +5,6 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 
-# Главное меню
-main_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-main_description = KeyboardButton('Описание проекта')
-main_balance = KeyboardButton('Баланс')
-main_algorithms = KeyboardButton('Алгоритмы')
-main_kb.add(main_description).row(main_balance, main_algorithms)
-
 # Меню выбора алгоритма
 algorithm_kb = InlineKeyboardMarkup(row_width=2)
 algorithm_test = InlineKeyboardButton(text='Test', callback_data='Test')

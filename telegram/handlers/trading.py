@@ -7,7 +7,8 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from service.algorithms import BotTest, BotCandles, BotSMA, bot_off
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
-from ..keyboards import *
+from ..keyboards.kb_trading import *
+from ..keyboards.kb_welcome import *
 
 
 class TradeStateGroup(StatesGroup):
