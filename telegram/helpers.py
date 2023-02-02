@@ -58,7 +58,7 @@ STATE_INTERVAL = '''
 '''
 STATE_QNTY = '''
 <em>
-Введите объем в USDT:
+Введите объем в USDT (минимальный возможный объем 20 USDT):
 </em>
 '''
 STATE_QNTY_TYPE_ERROR = '''
@@ -66,7 +66,12 @@ STATE_QNTY_TYPE_ERROR = '''
 Некорректные данные. Пожалуйста, введите числовое значение:
 </em>
 '''
-STATE_QNTY_VALUE_ERROR = f'Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{BALANCE_FREE}:</b>'
+STATE_QNTY_MAX_VALUE_ERROR = f'Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{BALANCE_FREE}:</b>'
+STATE_QNTY_MIN_VALUE_ERROR = '''
+<em>
+Объем не должен быть меньше 20 USDT
+</em>
+'''
 STATE_VALID_ERROR = '''
 <em>
 Данные заполнены неверно, попробуйте еще раз, пожалуйста.

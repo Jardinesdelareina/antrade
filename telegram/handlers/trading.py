@@ -120,12 +120,19 @@ async def qnty_message(message: types.Message, state: FSMContext):
                 parse_mode="HTML"
             )
             quantity_float = float(quantity)
-        if BALANCE_FREE - quantity_float > 0:
+
+        if quantity_float < 20:
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text=STATE_QNTY_MIN_VALUE_ERROR, 
+                parse_mode="HTML"
+            )
+        elif BALANCE_FREE - quantity_float > 0:
             data['qnty'] = quantity_float
         else:
             await bot.send_message(
                 chat_id=CHAT_ID, 
-                text=STATE_QNTY_VALUE_ERROR, 
+                text=STATE_QNTY_MAX_VALUE_ERROR, 
                 parse_mode="HTML"
             )
         
