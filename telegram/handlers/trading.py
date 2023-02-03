@@ -178,6 +178,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                     text=STATE_START,
                     reply_markup=exit_kb
                 )
+                await state.finish()
         except:
             await state.finish()
             print('Error start handler')

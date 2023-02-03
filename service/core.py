@@ -65,7 +65,6 @@ class Antrade:
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
-
         if order_type == 'SELL':
             order = CLIENT.create_order(
                 symbol=self.symbol, 
