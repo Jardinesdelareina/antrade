@@ -67,8 +67,7 @@ class BotCandles(Antrade):
                 else:
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
 
-            time.sleep(5)
-
+            time.sleep(60)
 
 
 class BotSMA(Antrade):
@@ -96,6 +95,6 @@ class BotSMA(Antrade):
                 if trend_bear | close:
                     self.place_order('SELL')
                 else:
-                    print(f'Открыта позиция {self.symbol} {self.calculate_quantity()}')
+                    print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
 
-            time.sleep(5)
+            time.sleep(60)
