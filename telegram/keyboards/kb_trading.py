@@ -45,11 +45,6 @@ start_kb = InlineKeyboardMarkup(row_width=1)
 start_bot = InlineKeyboardButton(text='Старт', callback_data='start')
 start_kb.add(start_bot)
 
-# Меню остановки алгоритма
-exit_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-exit_question = KeyboardButton('Остановить алгоритм')
-exit_kb.add(exit_question)
-
 # Кнопка остановки алгоритма: да/нет
 stop_kb = InlineKeyboardMarkup(row_width=1)
 stop_no = InlineKeyboardButton(text='Нет', callback_data='continue')
