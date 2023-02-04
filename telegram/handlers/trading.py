@@ -9,7 +9,6 @@ from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
 from ..keyboards.kb_welcome import *
-from ..keyboards.kb_manage import *
 
 
 class TradeStateGroup(StatesGroup):
@@ -19,6 +18,7 @@ class TradeStateGroup(StatesGroup):
     interval = State()
     qnty = State()
     start = State()
+    stop = State()
 
 
 # Пункт "Алгоритмы" главного меню, предлагает список алгоритмов, начинает цикл стейта
@@ -172,12 +172,12 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
 
                 STATE_START = f'{algorithm} online'
                 await callback.answer(STATE_START)
+                await TradeStateGroup.next()
                 await bot.send_message(
                     chat_id=CHAT_ID, 
                     text=STATE_START,
                     reply_markup=exit_kb
                 )
-                await state.finish()
         except:
             await state.finish()
             print('Error start handler')
@@ -188,6 +188,64 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
+# Размещение ордера SELL при вводе текстового сообщения 'Продать'
+async def selling_message(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        algorithm = data['algorithm']
+        if message.text == 'Продать':
+            try:
+                bot_close()
+                print('Sell')
+                STATE_SELL = f'{algorithm} sell'
+                await bot.send_message(
+                    chat_id=CHAT_ID, 
+                    text=STATE_SELL
+                )
+                await message.delete()
+            except:
+                await bot.send_message(
+                    chat_id=CHAT_ID, 
+                    text=CLOSE_EXCEPTION
+                )
+                await message.delete()
+
+# Контрольный вопрос, уточняющий, действительно ли алгоритм нужно отключить
+async def stop_message(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        algorithm = data['algorithm']
+        STATE_STOP_MESSAGE = f'Вы действительно хотите остановить {algorithm}?'
+        await bot.send_message(
+            chat_id=CHAT_ID, 
+            text=STATE_STOP_MESSAGE, 
+            parse_mode="HTML", 
+            reply_markup=stop_kb
+        )
+        await message.delete()
+
+# Коллбэк, обрабатывающий кнопки контрользоно вопроса: либо отключает алгоритм, либо продолжает его работу
+async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        data['stop'] = callback.data
+        algorithm = data['algorithm']
+        if data['stop'] == 'continue':
+            STATE_CONTINUE = f'{algorithm} продолжает работу' 
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text=STATE_CONTINUE,
+                reply_markup=exit_kb
+            )
+        if data['stop'] == 'stop':
+            bot_off()
+            STATE_STOP = f'{algorithm} offline'
+            print(algorithm, 'Stop')
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text=STATE_STOP, 
+                parse_mode="HTML",
+                reply_markup=main_kb
+            )
+            await state.finish()
+
 def register_handlers_trading(dp: Dispatcher):
     dp.register_message_handler(get_algorithm, text='Алгоритмы', state=None)
     dp.register_message_handler(cancel_handler, state="*", text='Отмена')
@@ -197,3 +255,6 @@ def register_handlers_trading(dp: Dispatcher):
     dp.register_callback_query_handler(interval_callback, state=TradeStateGroup.interval)
     dp.register_message_handler(qnty_message, state=TradeStateGroup.qnty)
     dp.register_callback_query_handler(start_callback, state=TradeStateGroup.start)
+    dp.register_message_handler(selling_message, state=TradeStateGroup.start)
+    dp.register_message_handler(stop_message, state=TradeStateGroup.stop)
+    dp.register_callback_query_handler(stop_callback, state=TradeStateGroup.stop)

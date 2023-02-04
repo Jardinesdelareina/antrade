@@ -1,4 +1,9 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (
+    ReplyKeyboardMarkup, 
+    KeyboardButton,
+    InlineKeyboardMarkup, 
+    InlineKeyboardButton,
+)
 
 # Меню выбора алгоритма
 algorithm_kb = InlineKeyboardMarkup(row_width=2)
@@ -39,3 +44,14 @@ interval_kb.row(interval_1m, interval_5m, interval_15m)\
 start_kb = InlineKeyboardMarkup(row_width=1)
 start_bot = InlineKeyboardButton(text='Старт', callback_data='start')
 start_kb.add(start_bot)
+
+# Меню остановки алгоритма
+exit_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+exit_question = KeyboardButton('Остановить алгоритм')
+exit_kb.add(exit_question)
+
+# Кнопка остановки алгоритма: да/нет
+stop_kb = InlineKeyboardMarkup(row_width=1)
+stop_no = InlineKeyboardButton(text='Нет', callback_data='continue')
+stop_yes = InlineKeyboardButton(text='Да', callback_data='stop')
+stop_kb.row(stop_no, stop_yes)
