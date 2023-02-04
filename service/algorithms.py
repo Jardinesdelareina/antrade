@@ -2,17 +2,22 @@ from .core import Antrade
 import time
 
 work = True
+close = False
+
+def bot_close():
+    global close
+    close = True
 
 def bot_off():
     global work
     work = False
 
-
 class BotTest(Antrade):
 
     def main(self):
-        global work
+        global work, close
         work = True
+        close = False
         print('Start')
         while work:
             if not self.open_position:
@@ -20,9 +25,11 @@ class BotTest(Antrade):
                 print('Покупка')
                 self.place_order('BUY')
             if self.open_position:
-                time.sleep(10)
-                print('Продажа')
-                self.place_order('SELL')
+                if close == True:
+                    print('Ручная продажа')
+                    self.place_order('SELL')
+                    print('Продано')
+                    close = False
 
             time.sleep(10)
 
