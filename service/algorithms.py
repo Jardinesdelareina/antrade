@@ -12,29 +12,8 @@ def bot_off():
     global work
     work = False
 
-class BotTest(Antrade):
-
-    def main(self):
-        global work, close
-        work = True
-        close = False
-        print('Start')
-        while work:
-            if not self.open_position:
-                time.sleep(5)
-                print('Покупка')
-                self.place_order('BUY')
-            if self.open_position:
-                if close == True:
-                    print('Ручная продажа')
-                    self.place_order('SELL')
-                    print('Продано')
-                    close = False
-
-            time.sleep(10)
-
-
 class BotCandles(Antrade):
+# Паттерн "Бычье поглощение"
 
     def main(self):
         global work
@@ -71,6 +50,7 @@ class BotCandles(Antrade):
 
 
 class BotSMA(Antrade):
+# Пересечение скользяших средних
 
     def main(self):
         global work
