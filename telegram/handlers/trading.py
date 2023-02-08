@@ -4,7 +4,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from service.algorithms import BotCandles, BotSMA, bot_off, bot_close
+from service.algorithms import BotTest, BotCandles, BotSMA
+from service.core import Antrade, Algorithm
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
@@ -43,7 +44,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 # Сохраняет алгоритм в стейт, предлагает список тикеров
 async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
-        if callback.data in ['Candles', 'SMA']:
+        if callback.data in ['Test', 'Candles', 'SMA']:
             data['algorithm'] = callback.data
             await TradeStateGroup.next()
             await bot.send_message(
@@ -158,7 +159,9 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
             algorithm = data['algorithm']
             if data['start'] == 'start':
 
-                if algorithm == 'Candles':
+                if algorithm == 'Test':
+                    state_data = BotTest(data['symbol'], data['interval'], data['qnty'])
+                elif algorithm == 'Candles':
                     state_data = BotCandles(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'SMA':
                     state_data = BotSMA(data['symbol'], data['interval'], data['qnty'])
@@ -192,7 +195,7 @@ async def manage_message(message: types.Message, state: FSMContext):
         algorithm = data['algorithm']
         if message.text == 'Продать':
             try:
-                bot_close()
+                Algorithm(data['symbol'], data['interval'], data['qnty']).bot_closed()
                 print('Sell')
                 await TradeStateGroup.last()
                 STATE_SELL = f'{algorithm} sell'
@@ -204,7 +207,8 @@ async def manage_message(message: types.Message, state: FSMContext):
             except:
                 await bot.send_message(
                     chat_id=CHAT_ID, 
-                    text=CLOSE_EXCEPTION
+                    text=CLOSE_EXCEPTION,
+                    parse_mode="HTML"
                 )
                 await message.delete()
         if message.text == 'Стоп':
@@ -228,13 +232,12 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
                 text=STATE_CONTINUE,
             )
         elif data['stop'] == 'stop':
-            bot_off()
+            Algorithm(data['symbol'], data['interval'], data['qnty']).bot_off()
             STATE_STOP = f'{algorithm} offline'
             print(algorithm, 'Stop')
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_STOP, 
-                parse_mode="HTML",
                 reply_markup=main_kb
             )
             await state.finish()
