@@ -25,6 +25,7 @@ class Test(Antrade):
                 time.sleep(5)
                 print('Покупка')
                 self.place_order('BUY')
+                #self.stop_loss()
                 break
         if self.open_position:
             while online:
@@ -140,11 +141,20 @@ class Woodie(Antrade):
         df['CCI_14'] = self.cci(14)
         df['CCI_6'] = self.cci(6)
 
+        # Последние 5 значений CCI14
+        last_five_values = df['CCI_14'][-5:]
+
+        # Последние пять значений CCI14 больше 0
+        green_zone = all(last_value > 0 for last_value in last_five_values)
+
+        # Бычий ZLR
+        zlr_bull = green_zone & ((df.CCI_6.iloc[-2] < 0) & (df.CCI_6.iloc[-1] > -30) & (df.CCI_14.iloc[-1] > 0))
+
         while online:
             if not self.open_position:
-                if df.CCI_14.iloc[-1] > 0:
+                if green_zone & zlr_bull:
                     print('Покупка')
-                    #self.place_order('BUY')
+                    self.place_order('BUY')
                     break
                 else:
                     print(f'{self.symbol} {df.Close.iloc[-1]} Ожидание')
@@ -152,7 +162,7 @@ class Woodie(Antrade):
 
         if self.open_position:
             while online:
-                if df.CCI_14.iloc[-1] | closed:
+                if closed:
                     print('Продажа')
                     #self.place_order('SELL')
                     break
