@@ -4,8 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from service.algorithms import BotTest, BotCandles, BotSMA
-from service.core import Antrade, Algorithm
+from service.algorithms import BotTest, BotCandles, BotSMA, bot_close, bot_off
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
@@ -195,7 +194,7 @@ async def manage_message(message: types.Message, state: FSMContext):
         algorithm = data['algorithm']
         if message.text == 'Продать':
             try:
-                Algorithm(data['symbol'], data['interval'], data['qnty']).bot_closed()
+                bot_close()
                 print('Sell')
                 await TradeStateGroup.last()
                 STATE_SELL = f'{algorithm} sell'
@@ -232,7 +231,7 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
                 text=STATE_CONTINUE,
             )
         elif data['stop'] == 'stop':
-            Algorithm(data['symbol'], data['interval'], data['qnty']).bot_off()
+            bot_off()
             STATE_STOP = f'{algorithm} offline'
             print(algorithm, 'Stop')
             await bot.send_message(
