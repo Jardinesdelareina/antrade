@@ -164,7 +164,7 @@ class Woodie(Antrade):
             while online:
                 if closed:
                     print('Продажа')
-                    #self.place_order('SELL')
+                    self.place_order('SELL')
                     break
                 else:
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')

@@ -2,7 +2,6 @@ from .config_binance import CLIENT
 from telegram.config_telegram import CHAT_ID, TELETOKEN
 import pandas as pd
 import requests, json
-from binance.exceptions import BinanceAPIException as bae
 from binance.helpers import round_step_size
 
 
@@ -69,16 +68,3 @@ class Antrade:
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
-
-    def stop_loss(self, price):
-        order = CLIENT.create_order(
-            symbol=self.symbol, 
-            side='SELL', 
-            type='STOP_LOSS', 
-            quantity=self.calculate_quantity(),
-            price=price,
-        )
-        message = f'Stop loss: {price}'
-        self.send_message(message)
-        print(message)
-        return order
