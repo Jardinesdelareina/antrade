@@ -26,7 +26,7 @@ class Antrade:
     def send_message(self, message) -> str:
         # Алерт в Telegram
         return requests.get(
-            'https://api.telegram.org/bot{}/sendMessage'.format(TELETOKEN), 
+            f'https://api.telegram.org/bot{TELETOKEN}/sendMessage', 
             params=dict(chat_id=CHAT_ID, text=message)
         )
 

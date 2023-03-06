@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from service.algorithms import bot_closed, bot_off, Test, Candles, SMA, Woodie
+from service.algorithms import Test, Candles, SMA, Woodie, bot_off, bot_closed
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
@@ -221,7 +221,7 @@ async def manage_message(message: types.Message, state: FSMContext):
             )
             await message.delete()
 
-# Коллбэк, обрабатывающий кнопки контрользоно вопроса: либо отключает алгоритм, либо продолжает его работу
+# Коллбэк, обрабатывающий кнопки контрольного вопроса: либо отключает алгоритм, либо продолжает его работу
 async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['stop'] = callback.data

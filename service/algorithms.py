@@ -25,7 +25,6 @@ class Test(Antrade):
                 time.sleep(5)
                 print('Покупка')
                 self.place_order('BUY')
-                #self.stop_loss()
                 break
         if self.open_position:
             while online:
