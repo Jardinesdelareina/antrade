@@ -17,8 +17,6 @@ class Test(Antrade):
 
     def main(self):
         global online, closed
-        online = True
-        closed = False
         print('Start')
         while online:
             if not self.open_position:
@@ -42,8 +40,6 @@ class Candles(Antrade):
 
     def main(self):
         global online, closed
-        online = True
-        closed = False
         print('Start')
 
         df = self.get_data()
@@ -85,8 +81,6 @@ class SMA(Antrade):
 
     def main(self):
         global online, closed
-        online = True
-        closed = False
         print('Start')
 
         df = self.get_data()
@@ -132,8 +126,6 @@ class Woodie(Antrade):
 
     def main(self):
         global online, closed
-        online = True
-        closed = False
         print('Start')
 
         df = self.get_data()
