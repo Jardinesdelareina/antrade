@@ -1,5 +1,5 @@
-from .core import Antrade
 import time
+from .core import Antrade
 
 online = True
 closed = False
@@ -26,13 +26,12 @@ class Test(Antrade):
                 break
         if self.open_position:
             while online:
-                if self.open_position:
-                    if closed == True:
-                        print('Ручная продажа')
-                        self.place_order('SELL')
-                        print('Продано')
-                        closed = False
-                        break
+                if closed:
+                    print('Ручная продажа')
+                    self.place_order('SELL')
+                    print('Продано')
+                    closed = False
+                    break
 
 
 class Candles(Antrade):
