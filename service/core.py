@@ -3,6 +3,7 @@ from telegram.config_telegram import CHAT_ID, TELETOKEN
 import pandas as pd
 import requests, json
 from binance.helpers import round_step_size
+from .helpers import round_float
 
 
 class Antrade:
@@ -22,7 +23,7 @@ class Antrade:
         df.index = pd.to_datetime(df.index, unit='ms')
         df = df.astype(float)
         return df
-
+    
     def send_message(self, message) -> str:
         # Алерт в Telegram
         return requests.get(
@@ -30,12 +31,16 @@ class Antrade:
             params=dict(chat_id=CHAT_ID, text=message)
         )
 
+    def last_price(self) -> float:
+        df = self.get_data()
+        last_price = df.Close.iloc[-1]
+        return last_price
+
     def calculate_quantity(self) -> float:
         # Расчет объема ордера
         symbol_info = CLIENT.get_symbol_info(self.symbol)
         step_size = symbol_info.get('filters')[1]['stepSize']
-        df = self.get_data()
-        order_volume = self.qnty / df.Close.iloc[-1]
+        order_volume = self.qnty / self.last_price()
         order_volume = round_step_size(order_volume, step_size)
         return order_volume
 
@@ -49,7 +54,7 @@ class Antrade:
                 quantity=self.calculate_quantity(),
             )
             self.open_position = True
-            self.buy_price = (order.get('fills')[0]['price'])
+            self.buy_price = round(float(order.get('fills')[0]['price']), round_float(num=self.last_price()))
             message = f'{self.symbol} \n Buy \n {self.buy_price}'
             self.send_message(message)
             print(message)
@@ -62,7 +67,7 @@ class Antrade:
                 quantity=self.calculate_quantity(),
             )
             self.open_position = False
-            sell_price = order.get('fills')[0]['price']
+            sell_price = round(float(order.get('fills')[0]['price']), round_float(num=self.last_price()))
             result = round(((float(sell_price) - float(self.buy_price)) * float(self.calculate_quantity())), 2)
             message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result} USDT'
             self.send_message(message)

@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from service.algorithms import Test, Candles, SMA, Woodie, bot_closed, bot_off
+from service.algorithms import bot_closed, bot_off, Test, Candles
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
@@ -43,7 +43,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 # Сохраняет алгоритм в стейт, предлагает список тикеров
 async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
-        if callback.data in ['Test', 'Candles', 'SMA', 'Woodie']:
+        if callback.data in ['Test', 'Candles']:
             data['algorithm'] = callback.data
             await TradeStateGroup.next()
             await bot.send_message(
@@ -162,10 +162,6 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                     state_data = Test(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'Candles':
                     state_data = Candles(data['symbol'], data['interval'], data['qnty'])
-                elif algorithm == 'SMA':
-                    state_data = SMA(data['symbol'], data['interval'], data['qnty'])
-                elif algorithm == 'Woodie':
-                    state_data = Woodie(data['symbol'], data['interval'], data['qnty'])
 
                 def work():
                     state_data.main()
