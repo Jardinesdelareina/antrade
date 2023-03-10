@@ -32,6 +32,7 @@ class Antrade:
         )
 
     def last_price(self) -> float:
+        # Цена закрытия последней свечи
         df = self.get_data()
         last_price = df.Close.iloc[-1]
         return last_price
@@ -45,7 +46,9 @@ class Antrade:
         return order_volume
 
     def place_order(self, order_type):
-        # Открытие ордера
+        # Размещение ордера
+
+        # Ордер на покупку
         if order_type == 'BUY':
             order = CLIENT.create_order(
                 symbol=self.symbol, 
@@ -59,6 +62,31 @@ class Antrade:
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
+
+            # Stop Loss ордер
+            df = self.get_data()
+            stop_order = CLIENT.create_order(
+                symbol=self.symbol,
+                side='SELL',
+                type='STOP_LOSS_LIMIT',
+                timeInForce='GTC',
+                quantity=self.calculate_quantity(),
+                stopPrice=df.Low.iloc[-1],
+                price=df.Low.iloc[-1],
+            )
+            print(f'Stop Loss {df.Low.iloc[-1]}')
+            print(json.dumps(stop_order, indent=4, sort_keys=True))
+            self.stop_loss_order_id = stop_order.get('orderId')
+            stop_order_status = CLIENT.get_order(symbol=self.symbol, orderId=self.stop_loss_order_id)
+            print(json.dumps(stop_order_status, indent=4, sort_keys=True))
+            if stop_order_status.get('status') == 'FILLED':
+                self.open_position = False
+                message = f'{self.symbol} \n Sell Stop {df.Low.iloc[-1]}'
+                self.send_message(message)
+                print(message)
+                print(json.dumps(stop_order, indent=4, sort_keys=True))
+
+        # Ордер на продажу
         elif order_type == 'SELL':
             order = CLIENT.create_order(
                 symbol=self.symbol, 
@@ -67,9 +95,17 @@ class Antrade:
                 quantity=self.calculate_quantity(),
             )
             self.open_position = False
-            sell_price = round(float(order.get('fills')[0]['price']), round_float(num=self.last_price()))
-            result = round(((float(sell_price) - float(self.buy_price)) * float(self.calculate_quantity())), 2)
-            message = f'{self.symbol} \n Sell \n {sell_price} \n Результат: {result} USDT'
+            self.sell_price = round(float(order.get('fills')[0]['price']), round_float(num=self.last_price()))
+            result = round((self.sell_price - self.buy_price * self.calculate_quantity()), 2)
+            message = f'{self.symbol} \n Sell \n {self.sell_price} \n Результат: {result} USDT'
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
+
+            # Отмена ордера Stop Loss
+            cancel_order = CLIENT.cancel_order(
+                symbol=self.symbol,
+                orderId=self.stop_loss_order_id
+            )
+            print(json.dumps(cancel_order, indent=4, sort_keys=True))
+            print('Calcel stop loss')

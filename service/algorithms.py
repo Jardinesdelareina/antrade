@@ -20,7 +20,7 @@ class Test(Antrade):
         print('Start')
         while online:
             if not self.open_position:
-                time.sleep(5)
+                time.sleep(2)
                 print('Покупка')
                 self.place_order('BUY')
                 break
