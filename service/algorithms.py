@@ -34,31 +34,26 @@ class Test(Antrade):
                     break
 
 
-class Candles(Antrade):
-    # Паттерн "Бычье поглощение"
+class SMA(Antrade):
+    # Пересечение скользяших средних
 
     def main(self):
         global online, closed
         print('Start')
 
         df = self.get_data()
-        df['HadgeSMA'] = df.Close.rolling(window=20).mean()
+        df['FastSMA'] = df.Close.rolling(window=6).mean()
+        df['SlowSMA'] = df.Close.rolling(window=100).mean()
 
-        # Цена выше/ниже SMA
-        trend_bull = df.Close.iloc[-1] > df.HadgeSMA.iloc[-1]
-        trend_bear = df.Close.iloc[-1] < df.HadgeSMA.iloc[-1]
+        trend_bull = (df.FastSMA.iloc[-1] > df.SlowSMA.iloc[-1]) \
+            and (df.FastSMA.iloc[-2] < df.SlowSMA.iloc[-2])
 
-        # Бычье поглощение
-        bullish_eng = ((df.Close.iloc[-1] > df.Open.iloc[-2]) \
-            and (df.Open.iloc[-2] > df.Close.iloc[-2]))
+        trend_bear = (df.FastSMA.iloc[-1] < df.SlowSMA.iloc[-1]) \
+            and (df.FastSMA.iloc[-2] > df.SlowSMA.iloc[-2])
 
-        # Медвежье поглощение
-        bearish_eng = ((df.Close.iloc[-1] < df.Open.iloc[-2]) \
-            and (df.Open.iloc[-2] < df.Close.iloc[-2]))
-            
         while online:
             if not self.open_position:
-                if bullish_eng & trend_bull:
+                if trend_bull:
                     self.place_order('BUY')
                     break
                 else:
@@ -67,7 +62,7 @@ class Candles(Antrade):
 
         if self.open_position:
             while online:
-                if bearish_eng | trend_bear | closed:
+                if trend_bear | closed:
                     self.place_order('SELL')
                     break
                 else:

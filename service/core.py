@@ -48,7 +48,6 @@ class Antrade:
     def place_order(self, order_type):
         # Размещение ордера
 
-        # Ордер на покупку
         if order_type == 'BUY':
             order = CLIENT.create_order(
                 symbol=self.symbol, 
@@ -63,30 +62,6 @@ class Antrade:
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
 
-            # Stop Loss ордер
-            df = self.get_data()
-            stop_order = CLIENT.create_order(
-                symbol=self.symbol,
-                side='SELL',
-                type='STOP_LOSS_LIMIT',
-                timeInForce='GTC',
-                quantity=self.calculate_quantity(),
-                stopPrice=df.Low.iloc[-1],
-                price=df.Low.iloc[-1],
-            )
-            print(f'Stop Loss {df.Low.iloc[-1]}')
-            print(json.dumps(stop_order, indent=4, sort_keys=True))
-            self.stop_loss_order_id = stop_order.get('orderId')
-            stop_order_status = CLIENT.get_order(symbol=self.symbol, orderId=self.stop_loss_order_id)
-            print(json.dumps(stop_order_status, indent=4, sort_keys=True))
-            if stop_order_status.get('status') == 'FILLED':
-                self.open_position = False
-                message = f'{self.symbol} \n Sell Stop {df.Low.iloc[-1]}'
-                self.send_message(message)
-                print(message)
-                print(json.dumps(stop_order, indent=4, sort_keys=True))
-
-        # Ордер на продажу
         elif order_type == 'SELL':
             order = CLIENT.create_order(
                 symbol=self.symbol, 
@@ -101,11 +76,3 @@ class Antrade:
             self.send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
-
-            # Отмена ордера Stop Loss
-            cancel_order = CLIENT.cancel_order(
-                symbol=self.symbol,
-                orderId=self.stop_loss_order_id
-            )
-            print(json.dumps(cancel_order, indent=4, sort_keys=True))
-            print('Calcel stop loss')
