@@ -5,6 +5,8 @@ from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from source.algorithms import bot_closed, bot_off, Test, SMA
+from source.helpers import get_min_qnty
+from source. config_binance import AVAILABLE_BALANCE, BALANCE_FREE_SPOT
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
@@ -12,7 +14,7 @@ from ..keyboards.kb_welcome import *
 
 
 class TradeStateGroup(StatesGroup):
-    # Состояние параметров: алгоритм, символ, таймфрейм, объем, старт/остановка алгоритма
+    """ Состояние параметров: алгоритм, символ, таймфрейм, объем, старт/остановка алгоритма """
     algorithm = State()
     symbol = State()
     interval = State()
@@ -21,8 +23,8 @@ class TradeStateGroup(StatesGroup):
     stop = State()
 
 
-# Пункт "Алгоритмы" главного меню, предлагает список алгоритмов, начинает цикл стейта
 async def get_algorithm(message: types.Message):
+    """ Пункт "Алгоритмы" главного меню, предлагает список алгоритмов, начинает цикл стейта """
     await TradeStateGroup.algorithm.set()
     await bot.send_message(
         chat_id=CHAT_ID, 
@@ -32,16 +34,18 @@ async def get_algorithm(message: types.Message):
     )
     await message.delete()
 
-# Отменяет действия, сбрасывает стейт
+
 async def cancel_handler(message: types.Message, state: FSMContext):
+    """ Отменяет действия, сбрасывает стейт """
     current_state = await state.get_state()
     if current_state is None:
         return
     await state.finish()
     await bot.send_message(chat_id=CHAT_ID, text='Отменено')
 
-# Сохраняет алгоритм в стейт, предлагает список тикеров
+
 async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
+    """ Сохраняет алгоритм в стейт, предлагает список тикеров """
     async with state.proxy() as data:
         if callback.data in ['Test', 'SMA']:
             data['algorithm'] = callback.data
@@ -61,8 +65,9 @@ async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
-# Сохраняет тикер в стейт, предлагает список интервалов
+
 async def symbol_callback(callback: types.CallbackQuery, state: FSMContext):
+    """ Сохраняет тикер в стейт, предлагает список интервалов """
     async with state.proxy() as data:
         if callback.data in [
             'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 
@@ -86,8 +91,9 @@ async def symbol_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )            
 
-# Сохраняет интервал в стейт, предлагает ввести рабочий объем ордеров
+
 async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
+    """ Сохраняет интервал в стейт, предлагает ввести рабочий объем ордеров """
     async with state.proxy() as data:
         if callback.data in ['1m', '5m', '15m', '30m', '1h', '4h', '1d']:
             data['interval'] = callback.data
@@ -107,9 +113,12 @@ async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
-# Введенный объем проходит валидацию (числовое ли значение и меньше ли баланса),
-# сохраняется в стейт, выводит всю информацию из стейта и предлагает кнопку старта алгоритма
+
 async def qnty_message(message: types.Message, state: FSMContext):
+    """ 
+    Введенный объем проходит валидацию (числовое ли значение и меньше ли баланса),
+    сохраняется в стейт, выводит всю информацию из стейта и предлагает кнопку старта алгоритма
+    """
     async with state.proxy() as data:
         quantity = message.text
         try:
@@ -122,13 +131,14 @@ async def qnty_message(message: types.Message, state: FSMContext):
             )
             quantity_float = float(quantity)
 
-        if quantity_float < 20:
+        if quantity_float < get_min_qnty():
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_QNTY_MIN_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-        elif BALANCE_FREE - quantity_float > 0:
+        elif (data['algorithm'] in ['Test', 'SMA']) and (BALANCE_FREE_SPOT - quantity_float > 0) or \
+            (data['algorithm'] in ['Test', 'WoodieCCI']) and (AVAILABLE_BALANCE - quantity_float > 0):
             data['qnty'] = quantity_float
         else:
             await bot.send_message(
@@ -142,16 +152,24 @@ async def qnty_message(message: types.Message, state: FSMContext):
         symbol = data['symbol']
         interval = data['interval']
         qnty = data['qnty']
-        STATE_RESULT = f'Алгоритм: {algorithm} \n Тикер: {symbol} \n Таймфрейм: {interval} \n Объем USDT: {qnty}'
+        STATE_RESULT = f'''
+            Алгоритм: {algorithm} 
+            Тикер: {symbol} 
+            Таймфрейм: {interval} 
+            Объем USDT: {qnty}
+        '''
         await bot.send_message(
             chat_id=CHAT_ID, 
             text=STATE_RESULT,
             reply_markup=start_kb
         )
 
-# Сохраняет в стейт коллбэк 'start' и запускает алгоритм - в зависимости от параметров
-# вызывается экземпляр определенного алгоритма с параметрами из стейта
+
 async def start_callback(callback: types.CallbackQuery, state: FSMContext):
+    """ 
+    Сохраняет в стейт коллбэк 'start' и запускает алгоритм - в зависимости от параметров
+    вызывается экземпляр определенного алгоритма с параметрами из стейта 
+    """
     async with state.proxy() as data:
         try:
             data['start'] = callback.data
@@ -160,7 +178,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
 
                 if algorithm == 'Test':
                     state_data = Test(data['symbol'], data['interval'], data['qnty'])
-                elif algorithm == 'Candles':
+                elif algorithm == 'SMA':
                     state_data = SMA(data['symbol'], data['interval'], data['qnty'])
 
                 def work():
@@ -185,20 +203,23 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 reply_markup=main_kb
             )
 
-# Размещение ордера SELL при вводе текстового сообщения 'Продать'
-# Либо команда 'Стоп'
+
 async def manage_message(message: types.Message, state: FSMContext):
+    """ 
+    Размещение ордера SELL при вводе текстового сообщения 'Продать'
+    Либо команда 'Стоп' 
+    """
     async with state.proxy() as data:
         algorithm = data['algorithm']
-        if message.text == 'Продать':
+        if message.text == 'Закрыть':
             try:
                 bot_closed()
-                print('Sell')
+                print('Closed')
                 await TradeStateGroup.last()
-                STATE_SELL = f'{algorithm} sell'
+                STATE_CLOSED = f'{algorithm} closed'
                 await bot.send_message(
                     chat_id=CHAT_ID, 
-                    text=STATE_SELL
+                    text=STATE_CLOSED
                 )
                 await message.delete()
             except:
@@ -217,8 +238,12 @@ async def manage_message(message: types.Message, state: FSMContext):
             )
             await message.delete()
 
-# Коллбэк, обрабатывающий кнопки контрольного вопроса: либо отключает алгоритм, либо продолжает его работу
+
 async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
+    """ 
+    Коллбэк, обрабатывающий кнопки контрольного вопроса: 
+    либо отключает алгоритм, либо продолжает его работу 
+    """
     async with state.proxy() as data:
         data['stop'] = callback.data
         algorithm = data['algorithm']
@@ -239,7 +264,7 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
             )
             await state.finish()
 
-def register_handlers_trading(dp: Dispatcher):
+def register_handlers_spot(dp: Dispatcher):
     dp.register_message_handler(get_algorithm, text='Алгоритмы', state=None)
     dp.register_message_handler(cancel_handler, state="*", text='Отмена')
     dp.register_message_handler(cancel_handler, Text(equals='Отмена', ignore_case=True), state="*")
