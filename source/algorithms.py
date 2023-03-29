@@ -1,5 +1,5 @@
 import time
-from .core import Antrade
+from .core import BinanceAPISpot
 
 online = True
 closed = False
@@ -13,7 +13,7 @@ def bot_closed():
     closed = True
 
 
-class Test(Antrade):
+class Test(BinanceAPISpot):
 
     def main(self):
         global online, closed
@@ -34,9 +34,8 @@ class Test(Antrade):
                     break
 
 
-class SMA(Antrade):
-    # Пересечение скользяших средних
-
+class SMA(BinanceAPISpot):
+    
     def main(self):
         global online, closed
         print('Start')

@@ -3,8 +3,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 # Меню выбора алгоритма
 algorithm_kb = InlineKeyboardMarkup(row_width=2)
 algorithm_test = InlineKeyboardButton(text='Test', callback_data='Test')
-algorithm_candles = InlineKeyboardButton(text='Candles', callback_data='Candles')
-algorithm_kb.add(algorithm_test).add(algorithm_candles)
+algorithm_sma = InlineKeyboardButton(text='SMA (Spot)', callback_data='SMA')
+algorithm_kb.add(algorithm_test).add(algorithm_sma)
 
 # Меню выбора тикера
 symbol_kb = InlineKeyboardMarkup(row_width=3)
