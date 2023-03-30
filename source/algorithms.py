@@ -19,7 +19,7 @@ class Test(BinanceAPI):
 
     def main(self):
         global online, closed
-        print('Start')
+        print('Test Start')
         while online:
             if not self.open_position:
                 time.sleep(2)
@@ -49,7 +49,7 @@ class SMA(BinanceAPI):
 
     def main(self):
         global online, closed
-        print('Start')
+        print('SMA Start')
 
         df = self.get_data()
         df['FastSMA'] = df.Close.rolling(window=6).mean()
@@ -72,7 +72,7 @@ class SMA(BinanceAPI):
 
         if self.open_position:
             while online:
-                if trend_bear | closed:
+                if trend_bear or closed:
                     self.place_order('SELL')
                     break
                 else:
@@ -89,6 +89,7 @@ class WoodieCCI(BinanceAPI):
     Зона покупки начинается с того момента, когда пять и более значений CCI_14 больше 0.
     BUY: CCI_6 (как отдельно CCI_6, так и вместе с CCI_14, если отрицательных значений меньше пяти) 
     пересекает значение 0 снизу вверх
+    SELL: CCI_6 опускается ниже 0
 
     online == False - остановка алгоритма
     closed == True - продажа по рынку вручную через интерфейс
@@ -124,7 +125,8 @@ class WoodieCCI(BinanceAPI):
             (df.CCI_6.iloc[-1] > 0) and \
             (df.CCI_14.iloc[-1] > 0)
         )
-
+        zero_line = df.CCI_6.iloc[-1] < 0
+    
         while online:
             if not self.open_position:
                 if green_zlr:
@@ -135,7 +137,7 @@ class WoodieCCI(BinanceAPI):
                     time.sleep(60)
         if self.open_position:
             while online:
-                if closed:
+                if zero_line or closed:
                     self.place_order('SELL')
                     break
                 else:
