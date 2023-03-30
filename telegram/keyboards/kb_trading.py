@@ -3,8 +3,9 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 # Меню выбора алгоритма
 algorithm_kb = InlineKeyboardMarkup(row_width=2)
 algorithm_test = InlineKeyboardButton(text='Test', callback_data='Test')
-algorithm_sma = InlineKeyboardButton(text='SMA (Spot)', callback_data='SMA')
-algorithm_kb.add(algorithm_test).add(algorithm_sma)
+algorithm_sma = InlineKeyboardButton(text='SMA', callback_data='SMA')
+algorithm_woodiecci = InlineKeyboardButton(text='WoodieCCI', callback_data='WoodieCCI')
+algorithm_kb.add(algorithm_test).add(algorithm_sma).add(algorithm_woodiecci)
 
 # Меню выбора тикера
 symbol_kb = InlineKeyboardMarkup(row_width=3)

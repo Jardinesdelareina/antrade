@@ -1,5 +1,5 @@
 import time
-from .core import BinanceAPISpot, BinanceAPIFutures
+from .core import BinanceAPI
 
 online = True
 closed = False
@@ -15,7 +15,7 @@ def bot_closed():
     closed = True
 
 
-class Test(BinanceAPISpot):
+class Test(BinanceAPI):
 
     def main(self):
         global online, closed
@@ -36,8 +36,17 @@ class Test(BinanceAPISpot):
                     break
 
 
-class SMA(BinanceAPISpot):
+class SMA(BinanceAPI):
+    """ 
+    Стратегия, реализующая логику пересечения быстрой и медленной скользящих средних 
     
+    BUY: FastSMA пересекает снизу вверх SlowSMA
+    SELL: FastSMA пересекает сверху вниз SlowSMA
+
+    online == False - остановка алгоритма
+    closed == True - продажа по рынку вручную через интерфейс
+    """
+
     def main(self):
         global online, closed
         print('Start')
@@ -71,7 +80,19 @@ class SMA(BinanceAPISpot):
                     time.sleep(60)
 
 
-class WooCandles(BinanceAPIFutures):
+class WoodieCCI(BinanceAPI):
+    """ 
+    Стратегия, описывающая трендовые паттерны WoodieCCI 
+    
+    Логика стратегии основывается на индикаторе CCI двух периодов: 6 и 14
+
+    Зона покупки начинается с того момента, когда пять и более значений CCI_14 больше 0.
+    BUY: CCI_6 (как отдельно CCI_6, так и вместе с CCI_14, если отрицательных значений меньше пяти) 
+    пересекает значение 0 снизу вверх
+
+    online == False - остановка алгоритма
+    closed == True - продажа по рынку вручную через интерфейс
+    """
 
     def get_cci_values(self, period: int) -> float:
         """ 
@@ -104,52 +125,19 @@ class WooCandles(BinanceAPIFutures):
             (df.CCI_14.iloc[-1] > 0)
         )
 
-        # Покупка: фиксация sell
-        green_eng_candles = ((df.Close.iloc[-1] >= df.Open.iloc[-2]) \
-            and (df.Open.iloc[-2] > df.Close.iloc[-2]))
-        green_double_candles = (df.Close.iloc[-1] < df.Close.iloc[-2]) and \
-            (df.Close.iloc[-2] < df.Close.iloc[-3])
-        
-        # Сигналы на продажу
-        red_zone = all(cci < 0 for cci in df['CCI_14'][-5:]) or \
-            (sum(1 for cci in df['CCI_14'][-5:] if cci > 0) < 5)
-        red_zlr = red_zone and (
-            (df.CCI_6.iloc[-2] > 0) and \
-            (df.CCI_6.iloc[-1] < 0) and \
-            (df.CCI_14.iloc[-1] < 0)
-        )
-
-        # Продажа: фиксация buy
-        red_eng_candles = ((df.Close.iloc[-1] <= df.Open.iloc[-2]) \
-            and (df.Open.iloc[-2] < df.Close.iloc[-2]))
-        red_double_candles = (df.Close.iloc[-1] < df.Close.iloc[-2]) and \
-            (df.Close.iloc[-2] < df.Close.iloc[-3])
-    
         while online:
             if not self.open_position:
                 if green_zlr:
                     self.place_order('BUY')
-                    self.place_stop_order('BUY')
-                    break
-                elif red_zlr:
-                    self.place_order('SELL')
-                    self.place_stop_order('SELL')
                     break
                 else:
                     print(f'{self.symbol} {df.Close.iloc[-1]} Ожидание')
                     time.sleep(60)
         if self.open_position:
             while online:
-                if green_eng_candles or green_double_candles:
+                if closed:
                     self.place_order('SELL')
-                    self.cancel_all_orders()
                     break
-                elif red_eng_candles or red_double_candles:
-                    self.place_order('BUY')
-                    self.cancel_all_orders()
-                    break
-                elif closed:
-                    pass
                 else:
                     print(f'Открыта позиция {self.symbol} {df.Close.iloc[-1]}')
                     time.sleep(60)

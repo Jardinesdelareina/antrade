@@ -4,9 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from source.algorithms import bot_closed, bot_off, Test, SMA
-from source.helpers import get_min_qnty
-from source. config_binance import AVAILABLE_BALANCE, BALANCE_FREE_SPOT
+from source.algorithms import bot_closed, bot_off, Test, SMA, WoodieCCI
 from ..config_telegram import bot, CHAT_ID
 from ..helpers import *
 from ..keyboards.kb_trading import *
@@ -23,7 +21,7 @@ class TradeStateGroup(StatesGroup):
     stop = State()
 
 
-async def get_algorithm(message: types.Message):
+async def get_algorithms(message: types.Message):
     """ Пункт "Алгоритмы" главного меню, предлагает список алгоритмов, начинает цикл стейта """
     await TradeStateGroup.algorithm.set()
     await bot.send_message(
@@ -47,7 +45,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
     """ Сохраняет алгоритм в стейт, предлагает список тикеров """
     async with state.proxy() as data:
-        if callback.data in ['Test', 'SMA']:
+        if callback.data in ['Test', 'SMA', 'WoodieCCI']:
             data['algorithm'] = callback.data
             await TradeStateGroup.next()
             await bot.send_message(
@@ -131,14 +129,13 @@ async def qnty_message(message: types.Message, state: FSMContext):
             )
             quantity_float = float(quantity)
 
-        if quantity_float < get_min_qnty():
+        if quantity_float < 20:
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_QNTY_MIN_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-        elif (data['algorithm'] in ['Test', 'SMA']) and (BALANCE_FREE_SPOT - quantity_float > 0) or \
-            (data['algorithm'] in ['Test', 'WoodieCCI']) and (AVAILABLE_BALANCE - quantity_float > 0):
+        elif BALANCE_FREE - quantity_float > 0:
             data['qnty'] = quantity_float
         else:
             await bot.send_message(
@@ -180,6 +177,8 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                     state_data = Test(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'SMA':
                     state_data = SMA(data['symbol'], data['interval'], data['qnty'])
+                elif algorithm == 'WoodieCCI':
+                    state_data = WoodieCCI(data['symbol'], data['interval'], data['qnty'])
 
                 def work():
                     state_data.main()
@@ -211,7 +210,7 @@ async def manage_message(message: types.Message, state: FSMContext):
     """
     async with state.proxy() as data:
         algorithm = data['algorithm']
-        if message.text == 'Закрыть':
+        if message.text == 'Продать':
             try:
                 bot_closed()
                 print('Closed')
@@ -265,7 +264,7 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
             await state.finish()
 
 def register_handlers_spot(dp: Dispatcher):
-    dp.register_message_handler(get_algorithm, text='Алгоритмы', state=None)
+    dp.register_message_handler(get_algorithms, text='Алгоритмы', state=None)
     dp.register_message_handler(cancel_handler, state="*", text='Отмена')
     dp.register_message_handler(cancel_handler, Text(equals='Отмена', ignore_case=True), state="*")
     dp.register_callback_query_handler(algorithm_callback, state=TradeStateGroup.algorithm)
