@@ -1,29 +1,33 @@
 from aiogram import types, Dispatcher
 from ..config_telegram import CHAT_ID, bot
-from ..helpers import START, DESCRIPTION, BALANCE, HELP
+from ..templates import START, DESCRIPTION, BALANCE, HELP
 from ..keyboards.kb_welcome import main_kb
 
 
 async def get_start(message: types.Message):
-    """ Главное меню """
+    """ Главное меню 
+    """
     await bot.send_message(chat_id=CHAT_ID, text=START, parse_mode="HTML", reply_markup=main_kb)
     await message.delete()
 
 
 async def get_description(message: types.Message):
-    """ Описание проекта """
+    """ Описание проекта 
+    """
     await bot.send_message(chat_id=CHAT_ID, text=DESCRIPTION, parse_mode="HTML")
     await message.delete()
 
 
 async def get_help(message: types.Message):
-    """ Помощь по интерфейсу """
+    """ Помощь по интерфейсу 
+    """
     await bot.send_message(chat_id=CHAT_ID, text=HELP, parse_mode="HTML")
     await message.delete()
 
 
 async def get_balance(message: types.Message):
-    """ Баланс спотового и фьючерсного кошельков """
+    """ Баланс спотового кошелька 
+    """
     await bot.send_message(chat_id=CHAT_ID, text=BALANCE, parse_mode="HTML")
     await message.delete()
 

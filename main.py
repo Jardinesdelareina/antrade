@@ -4,7 +4,7 @@ from telegram.handlers import welcome, trading
 
 
 async def on_startup(_):
-    print('Online')
+    print('Antrade Online')
 
 
 welcome.register_handlers_welcome(dp)

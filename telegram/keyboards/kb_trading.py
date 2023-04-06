@@ -17,10 +17,13 @@ symbol_ada = InlineKeyboardButton(text='ADA', callback_data='ADAUSDT')
 symbol_dot = InlineKeyboardButton(text='DOT', callback_data='DOTUSDT')
 symbol_matic = InlineKeyboardButton(text='MATIC', callback_data='MATICUSDT')
 symbol_avax = InlineKeyboardButton(text='AVAX', callback_data='AVAXUSDT')
-symbol_trx = InlineKeyboardButton(text='TRX', callback_data='TRXUSDT')
-symbol_kb.row(symbol_btc, symbol_eth, symbol_bnb)\
-    .row(symbol_xrp, symbol_ada, symbol_dot)\
-    .row(symbol_matic, symbol_avax, symbol_trx)
+symbol_link = InlineKeyboardButton(text='LINK', callback_data='LINKUSDT')
+symbol_sol = InlineKeyboardButton(text='SOL', callback_data='SOLUSDT')
+symbol_near = InlineKeyboardButton(text='NEAR', callback_data='NEARUSDT')
+symbol_uni = InlineKeyboardButton(text='UNI', callback_data='UNIUSDT')
+symbol_kb.row(symbol_btc, symbol_eth, symbol_bnb, symbol_xrp,)\
+        .row(symbol_ada, symbol_dot, symbol_matic, symbol_avax,)\
+        .row(symbol_link, symbol_sol, symbol_near, symbol_uni)
 
 # Меню выбора интервала
 interval_kb = InlineKeyboardMarkup(row_width=3)

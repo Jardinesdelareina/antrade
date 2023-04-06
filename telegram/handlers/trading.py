@@ -4,15 +4,21 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from source.bot_revers import bot_closed, bot_off, Test, SMA, WoodieCCI
-from ..config_telegram import bot, CHAT_ID
-from ..helpers import *
-from ..keyboards.kb_trading import *
-from ..keyboards.kb_welcome import *
+from antrade.algorithms import bot_closed, bot_off, Test, SMA, WoodieCCI
+from antrade.utils import symbol_list
+from telegram.config_telegram import bot, CHAT_ID
+from telegram.templates import (
+    STATE_ALGO, STATE_SYMBOL, STATE_INTERVAL, STATE_QNTY, STATE_QNTY_MAX_VALUE_ERROR, 
+    STATE_QNTY_MIN_VALUE_ERROR, STATE_QNTY_TYPE_ERROR, STATE_VALID_ERROR,
+    ORDER_EXCEPTION, CLOSE_EXCEPTION, BALANCE_USDT
+)
+from telegram.keyboards.kb_trading import algorithm_kb, symbol_kb, interval_kb, start_kb, stop_kb
+from telegram.keyboards.kb_welcome import main_kb
 
 
 class TradeStateGroup(StatesGroup):
-    """ Состояние параметров: алгоритм, символ, таймфрейм, объем, старт/остановка алгоритма """
+    """ Состояние параметров: алгоритм, символ, таймфрейм, объем, старт/остановка алгоритма 
+    """
     algorithm = State()
     symbol = State()
     interval = State()
@@ -22,7 +28,8 @@ class TradeStateGroup(StatesGroup):
 
 
 async def get_algorithms(message: types.Message):
-    """ Пункт "Алгоритмы" главного меню, предлагает список алгоритмов, начинает цикл стейта """
+    """ Пункт 'Алгоритмы' главного меню, предлагает список алгоритмов, начинает цикл стейта 
+    """
     await TradeStateGroup.algorithm.set()
     await bot.send_message(
         chat_id=CHAT_ID, 
@@ -34,7 +41,8 @@ async def get_algorithms(message: types.Message):
 
 
 async def cancel_handler(message: types.Message, state: FSMContext):
-    """ Отменяет действия, сбрасывает стейт """
+    """ Отменяет действия, сбрасывает стейт 
+    """
     current_state = await state.get_state()
     if current_state is None:
         return
@@ -43,7 +51,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 
 async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
-    """ Сохраняет алгоритм в стейт, предлагает список тикеров """
+    """ Сохраняет алгоритм в стейт, предлагает список тикеров 
+    """
     async with state.proxy() as data:
         if callback.data in ['Test', 'SMA', 'WoodieCCI']:
             data['algorithm'] = callback.data
@@ -65,13 +74,10 @@ async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
 
 
 async def symbol_callback(callback: types.CallbackQuery, state: FSMContext):
-    """ Сохраняет тикер в стейт, предлагает список интервалов """
+    """ Сохраняет тикер в стейт, предлагает список интервалов 
+    """
     async with state.proxy() as data:
-        if callback.data in [
-            'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 
-            'XRPUSDT', 'ADAUSDT', 'DOTUSDT', 
-            'MATICUSDT', 'AVAUSDT', 'TRXUSDT'
-        ]:
+        if callback.data in symbol_list:
             data['symbol'] = callback.data
             await TradeStateGroup.next()
             await bot.send_message(
@@ -91,7 +97,8 @@ async def symbol_callback(callback: types.CallbackQuery, state: FSMContext):
 
 
 async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
-    """ Сохраняет интервал в стейт, предлагает ввести рабочий объем ордеров """
+    """ Сохраняет интервал в стейт, предлагает ввести рабочий объем ордеров 
+    """
     async with state.proxy() as data:
         if callback.data in ['1m', '5m', '15m', '30m', '1h', '4h', '1d']:
             data['interval'] = callback.data
@@ -113,9 +120,8 @@ async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
 
 
 async def qnty_message(message: types.Message, state: FSMContext):
-    """ 
-    Введенный объем проходит валидацию (числовое ли значение и меньше ли баланса),
-    сохраняется в стейт, выводит всю информацию из стейта и предлагает кнопку старта алгоритма
+    """ Введенный объем проходит валидацию (числовое ли значение и меньше ли баланса),
+        сохраняется в стейт, выводит всю информацию из стейта и предлагает кнопку старта алгоритма
     """
     async with state.proxy() as data:
         quantity = message.text
@@ -129,13 +135,13 @@ async def qnty_message(message: types.Message, state: FSMContext):
             )
             quantity_float = float(quantity)
 
-        if quantity_float < 20:
+        if quantity_float < 15:
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_QNTY_MIN_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-        elif BALANCE_FREE - quantity_float > 0:
+        elif BALANCE_USDT - quantity_float > 0:
             data['qnty'] = quantity_float
         else:
             await bot.send_message(
@@ -149,12 +155,9 @@ async def qnty_message(message: types.Message, state: FSMContext):
         symbol = data['symbol']
         interval = data['interval']
         qnty = data['qnty']
-        STATE_RESULT = f'''
-            Алгоритм: {algorithm} 
-            Тикер: {symbol} 
-            Таймфрейм: {interval} 
-            Объем USDT: {qnty}
-        '''
+        STATE_RESULT = '''Алгоритм: {} \n Тикер: {} \n Таймфрейм: {} \n Объем USDT: {}'''.format(
+            algorithm, symbol, interval, qnty
+        )
         await bot.send_message(
             chat_id=CHAT_ID, 
             text=STATE_RESULT,
@@ -163,9 +166,8 @@ async def qnty_message(message: types.Message, state: FSMContext):
 
 
 async def start_callback(callback: types.CallbackQuery, state: FSMContext):
-    """ 
-    Сохраняет в стейт коллбэк 'start' и запускает алгоритм - в зависимости от параметров
-    вызывается экземпляр определенного алгоритма с параметрами из стейта 
+    """ Сохраняет в стейт коллбэк 'start' и запускает алгоритм - вызывается 
+        экземпляр определенного алгоритма с параметрами из стейта 
     """
     async with state.proxy() as data:
         try:
@@ -186,7 +188,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 thread_work.start()
 
                 await TradeStateGroup.next()
-                STATE_START = f'{algorithm} online'
+                STATE_START = f'{algorithm} начал свою работу'
                 await callback.answer(STATE_START)
                 await bot.send_message(
                     chat_id=CHAT_ID, 
@@ -194,7 +196,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 )
         except:
             await state.finish()
-            print('Error start handler')
+            print('Ошибка старта')
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=ORDER_EXCEPTION,
@@ -204,9 +206,8 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
 
 
 async def manage_message(message: types.Message, state: FSMContext):
-    """ 
-    Размещение ордера SELL при вводе текстового сообщения 'Продать'
-    Либо команда 'Стоп' 
+    """ Размещение ордера SELL при вводе текстового сообщения 'Продать',
+        остановка алгоритма при вводе сообщения 'Стоп' 
     """
     async with state.proxy() as data:
         algorithm = data['algorithm']
@@ -215,7 +216,7 @@ async def manage_message(message: types.Message, state: FSMContext):
                 bot_closed()
                 print('Closed')
                 await TradeStateGroup.last()
-                STATE_CLOSED = f'{algorithm} closed'
+                STATE_CLOSED = f'Совершена ручная продажа по {algorithm}'
                 await bot.send_message(
                     chat_id=CHAT_ID, 
                     text=STATE_CLOSED
@@ -239,9 +240,8 @@ async def manage_message(message: types.Message, state: FSMContext):
 
 
 async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
-    """ 
-    Коллбэк, обрабатывающий кнопки контрольного вопроса: 
-    либо отключает алгоритм, либо продолжает его работу 
+    """ Коллбэк, обрабатывающий кнопки контрольного вопроса: 
+        либо отключает алгоритм, либо продолжает его работу 
     """
     async with state.proxy() as data:
         data['stop'] = callback.data
@@ -254,14 +254,14 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
             )
         elif data['stop'] == 'stop':
             bot_off()
-            STATE_STOP = f'{algorithm} offline'
-            print(algorithm, 'Stop')
+            STATE_STOP = f'{algorithm} закончил свою работу'
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_STOP, 
                 reply_markup=main_kb
             )
             await state.finish()
+
 
 def register_handlers_spot(dp: Dispatcher):
     dp.register_message_handler(get_algorithms, text='Алгоритмы', state=None)
