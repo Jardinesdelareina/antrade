@@ -1,4 +1,4 @@
-from antrade.utils import symbol_list, get_balance
+from antrade.utils import symbol_list, get_balance_ticker
 
 START = '''
 <em><b>Главное меню</b></em>
@@ -25,7 +25,7 @@ DESCRIPTION = '''
 где бы вы ни были и находиться в курсе всех изменений, которые касаются ваших криптовалютных средств.
 
 Спасибо, что используете в своей торговле платформу <em><b>Antrade</b></em>!
-Удачной охоты!
+Удачной охоты! \U0001F340
 '''
 
 HELP = '''
@@ -53,15 +53,15 @@ HELP = '''
 <em>Обратите внимание, что для сокращения размера комиссий необходимо иметь на балансе некоторое количество BNB.</em>
 '''
 
-BALANCE_USDT = round(get_balance('USDT'), 1)
+BALANCE_USDT = round(get_balance_ticker('USDT'), 1)
 BALANCE = f'''
 Здесь вы можете отслеживать состояние вашего криптовалютного портфеля:
 USDT: <b>{BALANCE_USDT}</b>\n
 '''
 for ticker in symbol_list:
     ticker_name = ticker.replace('USDT', '')
-    balance = get_balance(ticker_name)
-    if balance > 0:
+    balance = round(get_balance_ticker(ticker_name), 5)
+    if balance > 0.00001:
         BALANCE += f'{ticker_name}: <b>{balance}</b>\n'
 
 STATE_ALGO = '''

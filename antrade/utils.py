@@ -6,7 +6,7 @@ symbol_list = [
 ]
 
 
-def get_balance(ticker: str) -> float:
+def get_balance_ticker(ticker: str) -> float:
     """ Баланс определенной криптовалюты на спотовом кошельке Binance
 
         ticker (str): Тикер криптовалюты (базовой, без котируемой, в формате 'BTC', 'ETH' и т.д.)

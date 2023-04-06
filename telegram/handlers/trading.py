@@ -230,7 +230,7 @@ async def manage_message(message: types.Message, state: FSMContext):
                 )
                 await message.delete()
         if message.text == 'Стоп':
-            STATE_STOP_MESSAGE = f'Вы действительно хотите остановить {algorithm}?'
+            STATE_STOP_MESSAGE = f'\U0001F6D1 Вы действительно хотите остановить {algorithm}?'
             await bot.send_message(
                 chat_id=CHAT_ID, 
                 text=STATE_STOP_MESSAGE, 
@@ -263,7 +263,7 @@ async def stop_callback(callback: types.CallbackQuery, state: FSMContext):
             await state.finish()
 
 
-def register_handlers_spot(dp: Dispatcher):
+def register_handlers_trading(dp: Dispatcher):
     dp.register_message_handler(get_algorithms, text='Алгоритмы', state=None)
     dp.register_message_handler(cancel_handler, state="*", text='Отмена')
     dp.register_message_handler(cancel_handler, Text(equals='Отмена', ignore_case=True), state="*")

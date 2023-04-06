@@ -1,7 +1,8 @@
 from aiogram import types, Dispatcher
-from ..config_telegram import CHAT_ID, bot
-from ..templates import START, DESCRIPTION, BALANCE, HELP
-from ..keyboards.kb_welcome import main_kb
+from telegram.config_telegram import CHAT_ID, bot
+from telegram.templates import START, DESCRIPTION, HELP, BALANCE
+from telegram.keyboards.kb_welcome import main_kb, balance_kb
+from antrade.utils import symbol_list, get_balance_ticker
 
 
 async def get_start(message: types.Message):
@@ -26,10 +27,33 @@ async def get_help(message: types.Message):
 
 
 async def get_balance(message: types.Message):
-    """ Баланс спотового кошелька 
+    """ Баланс спотового кошелька
     """
-    await bot.send_message(chat_id=CHAT_ID, text=BALANCE, parse_mode="HTML")
+    await bot.send_message(
+        chat_id=CHAT_ID, 
+        text=BALANCE, 
+        parse_mode="HTML", 
+        reply_markup=balance_kb
+    )
     await message.delete()
+
+
+async def update_balance(callback: types.CallbackQuery):
+    """ Обновление баланса
+    """
+    try:
+        if callback.data == 'update':
+            # Функция обновления баланса
+            await callback.answer('Баланс обновлен')
+            await bot.send_message(
+                chat_id=CHAT_ID, 
+                text='Обновление баланса', 
+                parse_mode="HTML", 
+                reply_markup=balance_kb
+            )
+    except:
+        BALANCE_EXCEPTION = 'Обновление баланса не удалось'
+        await bot.send_message(chat_id=CHAT_ID, text=BALANCE_EXCEPTION, reply_markup=balance_kb)
 
 
 def register_handlers_welcome(dp: Dispatcher):
@@ -37,3 +61,4 @@ def register_handlers_welcome(dp: Dispatcher):
     dp.register_message_handler(get_description, text='О проекте')
     dp.register_message_handler(get_help, text='Помощь')
     dp.register_message_handler(get_balance, text='Баланс')
+    dp.register_callback_query_handler(update_balance)
