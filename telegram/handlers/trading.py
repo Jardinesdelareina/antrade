@@ -6,6 +6,7 @@ from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from antrade.algorithms import bot_closed, bot_off, Test, SMA, WoodieCCI
 from antrade.utils import symbol_list
+from antrade.config_binance import BALANCE_FREE
 from telegram.config_telegram import bot, CHAT_ID
 from telegram.templates import (
     STATE_ALGO, STATE_SYMBOL, STATE_INTERVAL, STATE_QNTY, STATE_QNTY_MAX_VALUE_ERROR, 
@@ -141,7 +142,7 @@ async def qnty_message(message: types.Message, state: FSMContext):
                 text=STATE_QNTY_MIN_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-        elif BALANCE_USDT - quantity_float > 0:
+        elif BALANCE_FREE - quantity_float > 0:
             data['qnty'] = quantity_float
         else:
             await bot.send_message(

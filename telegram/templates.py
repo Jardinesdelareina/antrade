@@ -1,4 +1,4 @@
-from antrade.utils import symbol_list, get_balance_ticker
+from antrade.config_binance import BALANCE_FREE
 
 START = '''
 <em><b>Главное меню</b></em>
@@ -53,16 +53,10 @@ HELP = '''
 <em>Обратите внимание, что для сокращения размера комиссий необходимо иметь на балансе некоторое количество BNB.</em>
 '''
 
-BALANCE_USDT = round(get_balance_ticker('USDT'), 1)
 BALANCE = f'''
-Здесь вы можете отслеживать состояние вашего криптовалютного портфеля:
-USDT: <b>{BALANCE_USDT}</b>\n
+Баланс спотового кошелька:
+USDT: <b>{BALANCE_FREE}</b>\n
 '''
-for ticker in symbol_list:
-    ticker_name = ticker.replace('USDT', '')
-    balance = round(get_balance_ticker(ticker_name), 5)
-    if balance > 0.00001:
-        BALANCE += f'{ticker_name}: <b>{balance}</b>\n'
 
 STATE_ALGO = '''
 Давайте приступим!
@@ -75,7 +69,7 @@ STATE_INTERVAL = '''
 Выберите таймфрейм:
 '''
 STATE_QNTY = f'''
-USDT: <b>{BALANCE_USDT}</b>
+USDT: <b>{BALANCE_FREE}</b>
 Введите объем:
 '''
 STATE_QNTY_TYPE_ERROR = '''
@@ -85,7 +79,7 @@ STATE_QNTY_TYPE_ERROR = '''
 '''
 STATE_QNTY_MAX_VALUE_ERROR = f'''
 <em>
-Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{BALANCE_USDT}</b> USDT
+Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{BALANCE_FREE}</b> USDT
 </em>
 '''
 STATE_QNTY_MIN_VALUE_ERROR = f'''
