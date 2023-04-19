@@ -1,4 +1,4 @@
-from antrade.config_binance import BALANCE_FREE
+from antrade.utils import get_balance_spot
 
 START = '''
 <em><b>Главное меню</b></em>
@@ -53,11 +53,6 @@ HELP = '''
 <em>Обратите внимание, что для сокращения размера комиссий необходимо иметь на балансе некоторое количество BNB.</em>
 '''
 
-BALANCE = f'''
-Баланс спотового кошелька:
-USDT: <b>{BALANCE_FREE}</b>\n
-'''
-
 STATE_ALGO = '''
 Давайте приступим!
 В данном меню вы можете выбрать алгоритмы для начала вашей торговой сессии:
@@ -69,7 +64,7 @@ STATE_INTERVAL = '''
 Выберите таймфрейм:
 '''
 STATE_QNTY = f'''
-USDT: <b>{BALANCE_FREE}</b>
+USDT: <b>{get_balance_spot()}</b>
 Введите объем:
 '''
 STATE_QNTY_TYPE_ERROR = '''
@@ -79,7 +74,7 @@ STATE_QNTY_TYPE_ERROR = '''
 '''
 STATE_QNTY_MAX_VALUE_ERROR = f'''
 <em>
-Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{BALANCE_FREE}</b> USDT
+Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{get_balance_spot()}</b> USDT
 </em>
 '''
 STATE_QNTY_MIN_VALUE_ERROR = f'''

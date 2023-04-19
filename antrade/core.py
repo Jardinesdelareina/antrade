@@ -5,6 +5,7 @@ import requests, json
 from binance.helpers import round_step_size
 from .utils import round_float
 
+
 class BinanceAPI:
     """ Базовый класс, задающий параметры для торговли через API Binance
     """
