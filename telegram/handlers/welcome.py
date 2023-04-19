@@ -2,7 +2,7 @@ from aiogram import types, Dispatcher
 from telegram.config_telegram import CHAT_ID, bot
 from telegram.templates import START, DESCRIPTION, HELP, BALANCE
 from telegram.keyboards.kb_welcome import main_kb, balance_kb
-from antrade.utils import symbol_list, get_balance_ticker
+from antrade.config_binance import CLIENT
 
 
 async def get_start(message: types.Message):
@@ -43,11 +43,11 @@ async def update_balance(callback: types.CallbackQuery):
     """
     try:
         if callback.data == 'update':
-            # Функция обновления баланса
+            CLIENT.get_asset_balance(asset='USDT')
             await callback.answer('Баланс обновлен')
             await bot.send_message(
                 chat_id=CHAT_ID, 
-                text='Обновление баланса', 
+                text=BALANCE, 
                 parse_mode="HTML", 
                 reply_markup=balance_kb
             )

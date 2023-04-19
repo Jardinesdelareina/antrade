@@ -11,7 +11,7 @@ from telegram.config_telegram import bot, CHAT_ID
 from telegram.templates import (
     STATE_ALGO, STATE_SYMBOL, STATE_INTERVAL, STATE_QNTY, STATE_QNTY_MAX_VALUE_ERROR, 
     STATE_QNTY_MIN_VALUE_ERROR, STATE_QNTY_TYPE_ERROR, STATE_VALID_ERROR,
-    ORDER_EXCEPTION, CLOSE_EXCEPTION, BALANCE_USDT
+    ORDER_EXCEPTION, CLOSE_EXCEPTION
 )
 from telegram.keyboards.kb_trading import algorithm_kb, symbol_kb, interval_kb, start_kb, stop_kb
 from telegram.keyboards.kb_welcome import main_kb
