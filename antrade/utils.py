@@ -19,9 +19,13 @@ def round_float(num: float) -> int:
     return counter
 
 
-def get_balance_spot():
+def get_balance_spot(ticker) -> float:
     """ Получение баланса спотового кошелька Binance
     """
-    asset_balance = CLIENT.get_asset_balance(asset='USDT')
-    balance_free = round(float(asset_balance.get('free')), 1)
+    asset_balance = CLIENT.get_asset_balance(ticker)
+    if ticker == 'USDT':
+        round_balance = 1
+    else:
+        round_balance = 4
+    balance_free = round(float(asset_balance.get('free')), round_balance)
     return balance_free

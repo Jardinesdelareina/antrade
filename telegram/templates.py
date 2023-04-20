@@ -64,7 +64,7 @@ STATE_INTERVAL = '''
 Выберите таймфрейм:
 '''
 STATE_QNTY = f'''
-USDT: <b>{get_balance_spot()}</b>
+USDT: <b>{get_balance_spot('USDT')}</b>
 Введите объем:
 '''
 STATE_QNTY_TYPE_ERROR = '''
@@ -74,7 +74,7 @@ STATE_QNTY_TYPE_ERROR = '''
 '''
 STATE_QNTY_MAX_VALUE_ERROR = f'''
 <em>
-Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{get_balance_spot()}</b> USDT
+Объем превышает размер депозита. Пожалуйста, введите сумму меньше <b>{get_balance_spot('USDT')}</b> USDT
 </em>
 '''
 STATE_QNTY_MIN_VALUE_ERROR = f'''

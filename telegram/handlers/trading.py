@@ -141,7 +141,7 @@ async def qnty_message(message: types.Message, state: FSMContext):
                 text=STATE_QNTY_MIN_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-        elif get_balance_spot() - quantity_float > 0:
+        elif get_balance_spot('USDT') - quantity_float > 0:
             data['qnty'] = quantity_float
         else:
             await bot.send_message(

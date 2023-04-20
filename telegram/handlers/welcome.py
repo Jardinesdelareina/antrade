@@ -1,8 +1,8 @@
 from aiogram import types, Dispatcher
 from telegram.config_telegram import CHAT_ID, bot
 from telegram.templates import START, DESCRIPTION, HELP
-from telegram.keyboards.kb_welcome import main_kb, balance_kb
-from antrade.utils import get_balance_spot
+from telegram.keyboards.kb_welcome import main_kb
+from antrade.utils import get_balance_spot, symbol_list
 
 
 async def get_start(message: types.Message):
@@ -29,8 +29,13 @@ async def get_help(message: types.Message):
 async def get_balance(message: types.Message):
     """ Баланс спотового кошелька
     """
-    get_balance_spot()
-    BALANCE = f'Баланс спотового кошелька: \n USDT: <b>{get_balance_spot()}</b>'
+    balance_usdt = get_balance_spot('USDT')
+    BALANCE = f'<em>USDT</em>: <b>{balance_usdt}</b> \n'
+    for ticker in symbol_list:
+        ticker_name = ticker.replace('USDT', '')
+        balance = get_balance_spot(ticker_name)
+        if balance > 0:
+            BALANCE += f'<em>{ticker_name}</em>: <b>{balance}</b>\n'
     await bot.send_message(
         chat_id=CHAT_ID, 
         text=BALANCE, 
