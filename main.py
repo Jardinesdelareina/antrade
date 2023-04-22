@@ -1,6 +1,6 @@
 from aiogram import executor
 from telegram.config_telegram import dp
-from telegram.handlers import welcome, trading
+from telegram.handlers import trading, welcome
 
 
 async def on_startup(_):

@@ -1,5 +1,5 @@
 import time
-from .core import BinanceAPI
+from antrade.core import BinanceAPI
 
 online = True
 closed = False

@@ -2,7 +2,6 @@ from aiogram.types import (
     ReplyKeyboardMarkup, 
     KeyboardButton,
 )
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Главное меню
 main_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)

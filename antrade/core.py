@@ -1,39 +1,31 @@
-from .config_binance import CLIENT
-from telegram.config_telegram import CHAT_ID, TELETOKEN
 import pandas as pd
 import requests, json
 from binance.helpers import round_step_size
-from .utils import round_float
+from antrade.utils import round_float
+from antrade.config_binance import CLIENT
+from telegram.config_telegram import CHAT_ID, TELETOKEN
 
 
 class BinanceAPI:
     """ Базовый класс, задающий параметры для торговли через API Binance
     """
 
-    def __init__(self, symbol, interval, qnty=15, open_position=False):
-        """ Конструктор класса Antrade. Задает основные параметры, необходимые для взаимодействия
-            торговых алгоритмов с биржей
+    def __init__(self, symbol, interval, qnty):
+        """ Конструктор класса BaseParams
         
             symbol (str): Наименование тикера
             interval (str): Временной интервал
-            qnty (float): Размер ордера (по-умолчанию 15 USDT)
-            open_position (bool): Флаг, определяющий состояние позиции, по умолчанию False
+            qnty (float): Размер ордера
+            open_position (bool): Состояние, в котором находится алгоритм:
+                                если нет открытой позиции, значение атрибута - False,
+                                если ордер открыт - True
         """
         self.symbol = symbol
         self.interval = interval
         self.qnty = qnty
-        self.open_position = open_position
+        self.open_position = False
 
     
-    def send_message(self, message) -> str:
-        """ Уведомления в Telegram 
-        """
-        return requests.get(
-            f'https://api.telegram.org/bot{TELETOKEN}/sendMessage', 
-            params=dict(chat_id=CHAT_ID, text=message)
-        )
-
-
     def get_data(self):
         """ Получение данных 
         """
@@ -44,13 +36,22 @@ class BinanceAPI:
         df.index = pd.to_datetime(df.index, unit='ms')
         df = df.astype(float)
         return df
-
+    
 
     def get_last_price(self) -> float:
         """ Вывод цены закрытия последней свечи 
         """
         df = self.get_data()
         return df.Close.iloc[-1]
+
+    
+    def send_message(self, message) -> str:
+        """ Уведомления в Telegram 
+        """
+        return requests.get(
+            f'https://api.telegram.org/bot{TELETOKEN}/sendMessage', 
+            params=dict(chat_id=CHAT_ID, text=message)
+        )
 
 
     def calculate_quantity(self) -> float:
