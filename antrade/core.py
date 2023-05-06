@@ -11,8 +11,7 @@ class BinanceAPI:
     """
 
     def __init__(self, symbol, interval, qnty):
-        """ Конструктор класса BaseParams
-        
+        """ Конструктор класса BinanceAPI
             symbol (str): Наименование тикера
             interval (str): Временной интервал
             qnty (float): Размер ордера
@@ -29,7 +28,7 @@ class BinanceAPI:
     def get_data(self):
         """ Получение данных 
         """
-        df = pd.DataFrame(CLIENT.get_historical_klines(self.symbol, self.interval, '1000m UTC'))
+        df = pd.DataFrame(CLIENT.get_historical_klines(symbol=self.symbol, interval=self.interval, limit=70))
         df = df.iloc[:,:5]
         df.columns = ['Time', 'Open', 'High', 'Low', 'Close']
         df = df.set_index('Time')
