@@ -15,23 +15,19 @@ def bot_closed():
     closed = True
 
 
-class Test(BinanceAPI):
+class ManualTrading(BinanceAPI):
 
     def main(self):
         global online, closed
-        print('Test Start')
+        print('Manual Start')
         while online:
             if not self.open_position:
-                time.sleep(2)
-                print('Покупка')
                 self.place_order('BUY')
                 break
         if self.open_position:
             while online:
                 if closed:
-                    print('Ручная продажа')
                     self.place_order('SELL')
-                    print('Продано')
                     closed = False
                     break
 

@@ -3,11 +3,12 @@ import requests, json
 from binance.helpers import round_step_size
 from antrade.utils import round_float
 from antrade.config_binance import CLIENT
+from antrade.utils import send_message
 from telegram.config_telegram import CHAT_ID, TELETOKEN
 
 
 class BinanceAPI:
-    """ Базовый класс, задающий параметры для торговли через API Binance
+    """ Базовый класс, источник передачи данных через API Binance
     """
 
     def __init__(self, symbol, interval, qnty):
@@ -43,15 +44,6 @@ class BinanceAPI:
         df = self.get_data()
         return df.Close.iloc[-1]
 
-    
-    def send_message(self, message) -> str:
-        """ Уведомления в Telegram 
-        """
-        return requests.get(
-            f'https://api.telegram.org/bot{TELETOKEN}/sendMessage', 
-            params=dict(chat_id=CHAT_ID, text=message)
-        )
-
 
     def calculate_quantity(self) -> float:
         """ Расчет объема ордера 
@@ -82,7 +74,7 @@ class BinanceAPI:
                 round_float(num=self.get_last_price())
             )
             message = f'{self.symbol} \n Buy \n {self.buy_price}'
-            self.send_message(message)
+            send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))
 
@@ -100,6 +92,6 @@ class BinanceAPI:
             )
             result = round(((self.sell_price - self.buy_price) * self.calculate_quantity()), 2)
             message = f'{self.symbol} \n Sell \n {self.sell_price} \n Результат: {result} USDT'
-            self.send_message(message)
+            send_message(message)
             print(message)
             print(json.dumps(order, indent=4, sort_keys=True))

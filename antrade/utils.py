@@ -1,4 +1,6 @@
-from .config_binance import CLIENT
+import requests
+from antrade.config_binance import CLIENT
+from telegram.config_telegram import CHAT_ID, TELETOKEN
 
 symbol_list = [
     'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'XRPUSDT', 'DOTUSDT', 'LINKUSDT',
@@ -29,3 +31,12 @@ def get_balance_spot(ticker) -> float:
         round_balance = 4
     balance_free = round(float(asset_balance.get('free')), round_balance)
     return balance_free
+
+
+def send_message(message) -> str:
+    """ Уведомления в Telegram 
+    """
+    return requests.get(
+        f'https://api.telegram.org/bot{TELETOKEN}/sendMessage', 
+        params=dict(chat_id=CHAT_ID, text=message)
+    )

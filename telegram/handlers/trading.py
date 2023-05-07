@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from antrade.algorithms import bot_closed, bot_off, Test, SMA, WoodieCCI
+from antrade.algorithms import bot_closed, bot_off, ManualTrading, SMA, WoodieCCI
 from antrade.utils import symbol_list, get_balance_spot
 from telegram.config_telegram import bot, CHAT_ID
 from telegram.templates import (
@@ -176,7 +176,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
             if data['start'] == 'start':
 
                 if algorithm == 'Test':
-                    state_data = Test(data['symbol'], data['interval'], data['qnty'])
+                    state_data = ManualTrading(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'SMA':
                     state_data = SMA(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'WoodieCCI':
