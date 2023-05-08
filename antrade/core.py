@@ -11,7 +11,7 @@ class BinanceAPI:
     """ Базовый класс, источник передачи данных через API Binance
     """
 
-    def __init__(self, symbol, interval, qnty):
+    def __init__(self, symbol, interval, qnty=50):
         """ Конструктор класса BinanceAPI
             symbol (str): Наименование тикера
             interval (str): Временной интервал
