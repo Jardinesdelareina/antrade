@@ -7,21 +7,6 @@ symbol_list = [
     'ADAUSDT', 'SOLUSDT', 'MATICUSDT', 'UNIUSDT', 'NEARUSDT', 'AVAXUSDT'
 ]
 
-def time_sleep(interval):
-    """ Рассчитывает количество времени ожидания для функции time.sleep()
-    """
-    seconds = 60 * num
-    match interval:
-        case '30m':
-            num = 30
-        case '1h':
-            num = 60
-        case '4h':
-            num = 240
-        case '1d':
-            num = 1440
-    return seconds
-
 
 def round_float(num: float) -> int:
     """ Расчет количества знаков после запятой у числа типа float 
