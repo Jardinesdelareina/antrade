@@ -71,7 +71,7 @@ async def interval_callback(callback: types.CallbackQuery, state: FSMContext):
     """ Сохраняет интервал в стейт, предлагает сверить данные 
     """
     async with state.proxy() as data:
-        if callback.data in ['1m', '5m', '15m', '30m', '1h', '4h', '1d']:
+        if callback.data in ['1m', '30m', '1h', '4h', '1d']:
             data['interval'] = callback.data
             await InformerStateGroup.next()
             informer = data['informer']
@@ -104,7 +104,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
 
                 if informer == 'CCI':
                     def work():
-                        start_cci_informer()
+                        start_cci_informer(data['interval'])
                     thread_work = threading.Thread(target=work)
                     thread_work.start()
 

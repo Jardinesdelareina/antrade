@@ -2,7 +2,7 @@ import time
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from antrade.core import BinanceAPI
-from antrade.utils import symbol_list
+from antrade.utils import symbol_list, time_sleep
 
 online = True
 closed = False
@@ -16,8 +16,8 @@ def bot_off():
 class CCIInformer(BinanceAPI):
     """ Система обработки рыночных данных и информирования о ситуациях, 
         которые могут рассматриваться как торговые сигналы:
-        -ZLR
-        -быстрое пересечение индикатором нулевой линии
+        1. ZLR
+        2. быстрое пересечение индикатором нулевой линии
     """
 
     def get_cci_values(self, period: int) -> float:
@@ -144,10 +144,10 @@ class CCIInformer(BinanceAPI):
         while online:
             if green_zlr or red_zlr:
                 self.get_report()
-                time.sleep(3600)
+                time.sleep(time_sleep(interval=self.interval))
 
 
-def start_cci_informer():
+def start_cci_informer(interval):
     for ticker in symbol_list:
-        bot = CCIInformer(symbol=ticker, interval='1h')
-        bot.get_report()
+        bot = CCIInformer(symbol=ticker, interval=interval)
+        bot.main()
