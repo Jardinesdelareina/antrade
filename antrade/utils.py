@@ -22,7 +22,7 @@ def round_float(num: float) -> int:
 
 
 def get_balance_spot(ticker) -> float:
-    """ Получение баланса спотового кошелька
+    """ Получение баланса спотового кошелька Binance
     """
     asset_balance = CLIENT.get_asset_balance(ticker)
     if ticker == 'USDT':
@@ -31,18 +31,6 @@ def get_balance_spot(ticker) -> float:
         round_balance = 4
     balance_free = round(float(asset_balance.get('free')), round_balance)
     return balance_free
-
-
-def get_balance_futures_general():
-    """ Общий баланс фьючерсного кошелька
-    """
-    return round(float(CLIENT.futures_account_balance()[8]['balance']), 2)
-
-
-def get_balance_futures_available():
-    """ Свободные средства фьючерсного кошелька
-    """
-    return round(float(CLIENT.futures_account_balance()[8]['withdrawAvailable']), 2)
 
 
 def send_message(message) -> str:
