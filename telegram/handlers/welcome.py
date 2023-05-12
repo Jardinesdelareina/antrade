@@ -2,7 +2,12 @@ from aiogram import types, Dispatcher
 from telegram.config_telegram import CHAT_ID, bot
 from telegram.templates import START, DESCRIPTION, HELP
 from telegram.keyboards.kb_welcome import main_kb
-from antrade.utils import get_balance_spot, symbol_list
+from antrade.utils import (
+    get_balance_spot, 
+    get_balance_futures_general, 
+    get_balance_futures_available, 
+    symbol_list,
+)
 
 
 async def get_start(message: types.Message):
@@ -30,7 +35,16 @@ async def get_balance(message: types.Message):
     """ Баланс спотового кошелька
     """
     balance_usdt = get_balance_spot('USDT')
-    BALANCE = f'<em>USDT</em>: <b>{balance_usdt}</b> \n'
+    BALANCE = f'''
+    \U0001F4BC Ваш криптовалютный портфель
+
+    Futures
+    Основной баланс: <b>{get_balance_futures_general()}</b> USDT
+    Свободные средсва: <b>{get_balance_futures_available()}</b> USDT
+
+    Spot
+    <em>USDT</em>: <b>{balance_usdt}</b> \n
+    '''
     for ticker in symbol_list:
         ticker_name = ticker.replace('USDT', '')
         balance = get_balance_spot(ticker_name)
