@@ -4,8 +4,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from antrade.algorithms import bot_closed, bot_off, ManualTrading, SMA, WoodieCCI
-from antrade.utils import symbol_list, get_balance_spot
+from antrade.algorithms import bot_closed, bot_off, ManualTrading, CCI
+from antrade.utils import symbol_list, get_balance_ticker
 from telegram.config_telegram import bot, CHAT_ID
 from telegram.templates import (
     STATE_ALGO, STATE_SYMBOL, STATE_INTERVAL, STATE_QNTY, STATE_QNTY_MAX_VALUE_ERROR, 
@@ -54,7 +54,7 @@ async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
     """ Сохраняет алгоритм в стейт, предлагает список тикеров 
     """
     async with state.proxy() as data:
-        if callback.data in ['Test', 'SMA', 'WoodieCCI']:
+        if callback.data in ['Test', 'CCI']:
             data['algorithm'] = callback.data
             await TradeStateGroup.next()
             await bot.send_message(
@@ -141,7 +141,7 @@ async def qnty_message(message: types.Message, state: FSMContext):
                 text=STATE_QNTY_MIN_VALUE_ERROR, 
                 parse_mode="HTML"
             )
-        elif get_balance_spot('USDT') - quantity_float > 0:
+        elif get_balance_ticker('USDT') - quantity_float > 0:
             data['qnty'] = quantity_float
         else:
             await bot.send_message(
@@ -178,9 +178,7 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 if algorithm == 'Test':
                     state_data = ManualTrading(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'SMA':
-                    state_data = SMA(data['symbol'], data['interval'], data['qnty'])
-                elif algorithm == 'WoodieCCI':
-                    state_data = WoodieCCI(data['symbol'], data['interval'], data['qnty'])
+                    state_data = CCI(data['symbol'], data['interval'], data['qnty'])
 
                 def work():
                     state_data.main()

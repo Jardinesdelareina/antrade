@@ -1,17 +1,16 @@
 import pandas as pd
-import requests, json
+import json
 from binance.helpers import round_step_size
 from antrade.utils import round_float
 from antrade.config_binance import CLIENT
 from antrade.utils import send_message
-from telegram.config_telegram import CHAT_ID, TELETOKEN
 
 
 class BinanceAPI:
     """ Базовый класс, источник передачи данных через API Binance
     """
 
-    def __init__(self, symbol, interval, qnty=50):
+    def __init__(self, symbol, interval, qnty):
         """ Конструктор класса BinanceAPI
             symbol (str): Наименование тикера
             interval (str): Временной интервал
