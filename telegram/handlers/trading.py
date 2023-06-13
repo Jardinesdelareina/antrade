@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from antrade.algorithms import bot_closed, bot_off, ManualTrading, CCI
+from antrade.algorithms import bot_closed, bot_off, ManualTrading, SMA, WoodieCCI
 from antrade.utils import symbol_list, get_balance_ticker
 from telegram.config_telegram import bot, CHAT_ID
 from telegram.templates import (
@@ -54,7 +54,7 @@ async def algorithm_callback(callback: types.CallbackQuery, state: FSMContext):
     """ Сохраняет алгоритм в стейт, предлагает список тикеров 
     """
     async with state.proxy() as data:
-        if callback.data in ['Test', 'CCI']:
+        if callback.data in ['Test', 'SMA', 'WoodieCCI']:
             data['algorithm'] = callback.data
             await TradeStateGroup.next()
             await bot.send_message(
@@ -178,7 +178,9 @@ async def start_callback(callback: types.CallbackQuery, state: FSMContext):
                 if algorithm == 'Test':
                     state_data = ManualTrading(data['symbol'], data['interval'], data['qnty'])
                 elif algorithm == 'SMA':
-                    state_data = CCI(data['symbol'], data['interval'], data['qnty'])
+                    state_data = SMA(data['symbol'], data['interval'], data['qnty'])
+                elif algorithm == 'WoodieCCI':
+                    state_data = WoodieCCI(data['symbol'], data['interval'], data['qnty'])
 
                 def work():
                     state_data.main()
